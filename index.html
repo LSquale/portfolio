@@ -4,413 +4,586 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portfolio Victor Trioux</title>
-  <link rel="stylesheet" href="main.css">
-  <script src="souris.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="fontawesome/css/all.min.css">
   <link rel="icon" href="image/icons8-portfolio-64.png" type="image/png">
+  <style>
+    :root {
+      --bg:     #050a12;
+      --panel:  rgba(10,25,50,0.75);
+      --border: rgba(0,230,180,0.18);
+      --green:  #00e6b4;
+      --green2: #00ffcc;
+      --blue:   #00aaff;
+      --text:   #c8ddf0;
+      --muted:  #5d7a99;
+      --mono:   'Share Tech Mono', monospace;
+      --head:   'Rajdhani', sans-serif;
+      --body:   'Exo 2', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--body); line-height: 1.7; overflow-x: hidden; }
 
+    #matrix-canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; opacity:.07; pointer-events:none; }
+
+    body::before {
+      content:''; position:fixed; inset:0;
+      background-image: linear-gradient(rgba(0,230,180,.03) 1px,transparent 1px), linear-gradient(90deg,rgba(0,230,180,.03) 1px,transparent 1px);
+      background-size: 40px 40px; z-index:0; pointer-events:none;
+    }
+
+    /* ── STICKY NAV ── */
+    .sticky-nav {
+      position: sticky; top:0; z-index:100;
+      background: rgba(5,10,18,.92); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width:1100px; margin:0 auto; padding:0 24px;
+      display:flex; align-items:center; justify-content:space-between; height:52px;
+    }
+    .nav-brand { font-family:var(--mono); font-size:.75rem; color:var(--green); letter-spacing:.15em; text-decoration:none; }
+    .nav-links { display:flex; gap:4px; list-style:none; }
+    .nav-links a {
+      font-family:var(--mono); font-size:.68rem; letter-spacing:.12em;
+      color:var(--muted); text-decoration:none; padding:5px 12px;
+      border-radius:3px; transition:color .2s, background .2s; text-transform:uppercase;
+    }
+    .nav-links a:hover, .nav-links a.active { color:var(--green); background:rgba(0,230,180,.08); }
+
+    /* ── WRAPPER ── */
+    .wrapper { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 24px 80px; }
+
+    /* ── HERO ── */
+    .hero { padding:80px 0 60px; text-align:center; animation:fadeIn .8s ease both; }
+    .hero-badge {
+      display:inline-block; font-family:var(--mono); font-size:.72rem; letter-spacing:.2em;
+      color:var(--green); background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.3);
+      padding:5px 16px; border-radius:2px; margin-bottom:28px;
+    }
+    .hero h1 {
+      font-family:var(--head); font-size:clamp(2.8rem,7vw,5rem); font-weight:700;
+      color:#fff; letter-spacing:.05em; text-transform:uppercase; line-height:1.05;
+      animation:slideUp .7s ease both .1s;
+    }
+    .hero h1 span { color:var(--green); text-shadow:0 0 30px rgba(0,230,180,.4); }
+    .hero-sub { font-family:var(--mono); font-size:.85rem; color:var(--muted); margin-top:16px; letter-spacing:.1em; animation:fadeIn .8s ease both .25s; }
+    .hero-meta { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:28px; animation:fadeIn 1s ease both .4s; }
+    .meta-chip {
+      display:flex; align-items:center; gap:7px; font-family:var(--mono); font-size:.72rem;
+      color:var(--muted); background:var(--panel); border:1px solid var(--border);
+      padding:6px 14px; border-radius:3px; backdrop-filter:blur(8px);
+    }
+    .meta-chip .dot { width:5px; height:5px; background:var(--green); border-radius:50%; box-shadow:0 0 6px var(--green); animation:pulse 2s infinite; }
+    .hero-line { width:120px; height:2px; background:linear-gradient(90deg,transparent,var(--green),transparent); margin:36px auto 0; }
+
+    /* ── SECTION LABELS ── */
+    .section-label {
+      font-family:var(--mono); font-size:.7rem; letter-spacing:.25em; color:var(--green);
+      text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:10px;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .section-title { font-family:var(--head); font-size:clamp(1.5rem,3vw,2.2rem); font-weight:700; color:#fff; letter-spacing:.05em; text-transform:uppercase; margin-bottom:28px; }
+    .content-section { margin-bottom:70px; }
+
+    /* ── ABOUT ── */
+    .about-layout { display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:start; }
+    .about-text {
+      background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--green);
+      border-radius:6px; padding:32px 36px; backdrop-filter:blur(12px);
+    }
+    .about-text p { font-size:.95rem; color:var(--text); line-height:1.85; }
+    .about-text p + p { margin-top:12px; }
+    .about-text a { color:var(--green); border-bottom:1px solid rgba(0,230,180,.25); }
+    .about-text a:hover { color:var(--green2); }
+    .about-sidebar { display:flex; flex-direction:column; gap:14px; }
+    .cv-card {
+      background:var(--panel); border:1px solid rgba(0,230,180,.3); border-radius:6px;
+      padding:24px; text-align:center; backdrop-filter:blur(12px); transition:border-color .3s, box-shadow .3s;
+    }
+    .cv-card:hover { border-color:rgba(0,230,180,.5); box-shadow:0 8px 32px rgba(0,230,180,.1); }
+    .cv-card-icon { font-size:2rem; color:var(--green); margin-bottom:10px; }
+    .cv-card h4 { font-family:var(--head); font-size:.9rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px; }
+    .btn-cv {
+      display:inline-block; font-family:var(--mono); font-size:.72rem; letter-spacing:.15em;
+      color:var(--green); background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35);
+      padding:10px 20px; border-radius:4px; text-decoration:none; text-transform:uppercase;
+      transition:background .25s, box-shadow .25s;
+    }
+    .btn-cv:hover { background:rgba(0,230,180,.18); box-shadow:0 0 20px rgba(0,230,180,.15); color:var(--green2); }
+    .info-card { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:20px; backdrop-filter:blur(8px); }
+    .info-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(0,230,180,.08); }
+    .info-row:last-child { border-bottom:none; }
+    .info-row i { color:var(--green); width:16px; text-align:center; font-size:.85rem; }
+    .info-row span { color:var(--muted); font-family:var(--mono); font-size:.72rem; letter-spacing:.05em; }
+
+    /* ── BTS ── */
+    .bts-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .bts-block { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:24px; backdrop-filter:blur(10px); }
+    .bts-block.full { grid-column:1/-1; }
+    .bts-block h4 { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin-bottom:12px; }
+    .bts-block p { font-size:.9rem; color:var(--text); line-height:1.8; }
+    .career-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:20px; }
+    .career-link {
+      display:flex; align-items:center; gap:10px; background:rgba(8,18,38,.8);
+      border:1px solid var(--border); border-radius:5px; padding:12px 16px;
+      text-decoration:none; transition:border-color .25s, transform .25s, color .25s;
+      font-size:.85rem; color:var(--text);
+    }
+    .career-link::before { content:'▸'; color:var(--green); flex-shrink:0; }
+    .career-link:hover { border-color:rgba(0,230,180,.4); transform:translateX(4px); color:var(--green); }
+    .career-label { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin:28px 0 14px; }
+
+    /* ── PROJECTS ── */
+    .projects-intro { font-size:.92rem; color:var(--text); margin-bottom:20px; }
+    .projects-intro a { color:var(--green); border-bottom:1px solid rgba(0,230,180,.3); margin-left:8px; }
+    .project-gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; }
+    .project-gallery a { border:1px solid var(--border); border-radius:6px; overflow:hidden; display:block; transition:border-color .3s, transform .3s, box-shadow .3s; text-decoration:none; }
+    .project-gallery a:hover { border-color:rgba(0,230,180,.45); transform:translateY(-4px); box-shadow:0 10px 36px rgba(0,230,180,.1); }
+    .project-gallery img { width:100%; height:140px; object-fit:cover; display:block; filter:brightness(.8) saturate(.75); transition:filter .3s; }
+    .project-gallery a:hover img { filter:brightness(1) saturate(1); }
+
+    /* ── VEILLE ── */
+    .veille-intro {
+      background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--green);
+      border-radius:6px; padding:24px 28px; backdrop-filter:blur(10px); margin-bottom:20px;
+    }
+    .veille-intro p { font-size:.92rem; color:var(--text); line-height:1.85; margin-bottom:10px; }
+    .veille-intro ul { list-style:none; display:flex; flex-direction:column; gap:6px; margin-top:8px; padding-left:0; }
+    .veille-intro li { font-size:.88rem; color:var(--text); padding-left:16px; position:relative; line-height:1.7; }
+    .veille-intro li::before { content:'▸'; color:var(--green); position:absolute; left:0; }
+    .veille-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:14px; }
+    .veille-card {
+      background:rgba(8,18,38,.85); border:1px solid var(--border); border-radius:6px; padding:18px;
+      display:grid; grid-template-columns:72px 1fr; gap:0 14px; align-items:start;
+      transition:border-color .3s, transform .3s, box-shadow .3s;
+    }
+    .veille-card:hover { border-color:rgba(0,230,180,.4); transform:translateY(-3px); box-shadow:0 6px 28px rgba(0,230,180,.08); }
+    .veille-card .icon { grid-column:1; grid-row:1/span 10; width:72px; height:72px; border-radius:4px; overflow:hidden; border:1px solid rgba(0,230,180,.15); align-self:center; }
+    .veille-card .icon img { width:100%; height:100%; object-fit:cover; filter:brightness(.9) saturate(.8); transition:filter .3s; }
+    .veille-card:hover .icon img { filter:brightness(1) saturate(1); }
+    .veille-card h3, .veille-card p, .veille-card a { grid-column:2; }
+    .veille-card h3 { font-family:var(--head); font-weight:700; font-size:.95rem; color:#fff; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+    .veille-card p { font-size:.8rem; color:var(--muted); margin-bottom:4px; line-height:1.6; }
+    .veille-card a { font-family:var(--mono); font-size:.7rem; color:var(--green); text-decoration:none; letter-spacing:.06em; margin-right:10px; }
+    .veille-card a:hover { color:var(--green2); }
+
+    /* ── ENTREPRISE ── */
+    .certs-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+    .cert-badge {
+      font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; color:var(--green);
+      background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.25); padding:5px 12px; border-radius:3px;
+    }
+    .services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px; margin-bottom:24px; }
+    .service-card {
+      background:var(--panel); border:1px solid var(--border); border-radius:6px;
+      padding:20px 22px; backdrop-filter:blur(8px); transition:border-color .3s, transform .3s;
+    }
+    .service-card:hover { border-color:rgba(0,230,180,.35); transform:translateY(-2px); }
+    .service-card h4 { font-family:var(--head); font-weight:700; font-size:.95rem; color:#fff; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
+    .service-card h4 a { color:#fff; text-decoration:none; transition:color .2s; }
+    .service-card h4 a:hover { color:var(--green); }
+    .service-card p { font-size:.85rem; color:var(--muted); line-height:1.7; }
+    .entreprise-text {
+      background:var(--panel); border:1px solid var(--border); border-radius:6px;
+      padding:28px 32px; backdrop-filter:blur(10px); margin-bottom:24px;
+    }
+    .entreprise-text p { font-size:.92rem; color:var(--text); line-height:1.85; margin-bottom:14px; }
+    .entreprise-text p:last-child { margin-bottom:0; }
+    .entreprise-text a { color:var(--green); border-bottom:1px solid rgba(0,230,180,.25); }
+    .entreprise-text a:hover { color:var(--green2); }
+    .tickets-label { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin-bottom:14px; }
+    .ticket-gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
+    .ticket-gallery a { border:1px solid var(--border); border-radius:6px; overflow:hidden; display:block; transition:border-color .3s, transform .3s, box-shadow .3s; text-decoration:none; }
+    .ticket-gallery a:hover { border-color:rgba(0,230,180,.45); transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,230,180,.1); }
+    .ticket-gallery img { width:100%; height:110px; object-fit:cover; display:block; filter:brightness(.8) saturate(.7); transition:filter .3s; }
+    .ticket-gallery a:hover img { filter:brightness(1) saturate(1); }
+
+    /* ── CONTACT & FOOTER ── */
+    .footer-large { border-top:1px solid var(--border); padding-top:50px; margin-top:20px; }
+    #contact h2 { font-family:var(--head); font-size:1.4rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
+    #contact h2 i { color:var(--green); margin-right:8px; }
+    .contact-form { display:flex; flex-direction:column; gap:12px; max-width:560px; margin-top:20px; }
+    .contact-form label { font-family:var(--mono); font-size:.7rem; color:var(--muted); letter-spacing:.15em; text-transform:uppercase; }
+    .contact-form input, .contact-form textarea {
+      background:rgba(5,10,18,.85); border:1px solid var(--border); border-radius:4px;
+      color:var(--text); font-family:var(--body); font-size:.9rem; padding:10px 14px;
+      outline:none; transition:border-color .25s, box-shadow .25s; resize:vertical; width:100%;
+    }
+    .contact-form input:focus, .contact-form textarea:focus { border-color:rgba(0,230,180,.5); box-shadow:0 0 0 2px rgba(0,230,180,.08); }
+    .contact-form button {
+      background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35); border-radius:4px;
+      color:var(--green); font-family:var(--mono); font-size:.78rem; letter-spacing:.15em;
+      padding:12px 28px; cursor:pointer; text-transform:uppercase; transition:background .25s, box-shadow .25s; align-self:flex-start;
+    }
+    .contact-form button:hover { background:rgba(0,230,180,.18); box-shadow:0 0 20px rgba(0,230,180,.15); }
+    .footer-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:28px; margin:36px 0 24px; }
+    .footer-col h3 { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin-bottom:12px; }
+    .footer-col p { font-size:.85rem; color:var(--muted); margin-bottom:6px; }
+    .footer-col a { color:var(--muted); text-decoration:none; transition:color .2s; }
+    .footer-col a:hover { color:var(--green); }
+    .footer-col a i { margin-right:6px; }
+    .footer-col a p { color:inherit; }
+    .footer-credit { font-family:var(--mono); font-size:.7rem; color:var(--muted); letter-spacing:.1em; text-align:center; padding:20px 0 0; border-top:1px solid var(--border); margin-top:8px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+    @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px) {
+      .about-layout { grid-template-columns:1fr; }
+      .bts-grid { grid-template-columns:1fr; }
+      .bts-block.full { grid-column:1; }
+      .nav-links { display:none; }
+    }
+    @media(max-width:480px) {
+      .veille-card { grid-template-columns:1fr; }
+      .veille-card .icon { grid-row:1; width:100%; height:120px; }
+      .veille-card h3, .veille-card p, .veille-card a { grid-column:1; }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- OVERLAY qui englobe TOUT -->
-  <div class="overlay">
+<canvas id="matrix-canvas"></canvas>
 
-    <header>
-      <nav>
-        <ul>
-          <li><a href="page_accueil.html" class="glow-animated"> Accueil</a></li>		
-          <li><a href="#about" class="glow-animated"> À propos</a></li>
-          <li><a href="#bts" class="glow-animated"> BTS SIO</a></li>
-          <li><a href="#projects" class="glow-animated"> Projets (E5)</a></li>
-          <li><a href="#veille-hardware" class="glow-animated"> Veille</a></li>
-          <li><a href="#entreprise" class="glow-animated"> Entreprise</a></li>
-        </ul>
-      </nav>
-      <h1 class="glow-animated">
-	  <i class="fas fa-user icon"></i> Victor Trioux</h1>
-      <p>Étudiant en BTS SIO - SISR</p>
-    </header>
-
-    <!-- ABOUT -->
-    <section id="about">
-      <button class="accordion-header" ><span><i class="fas fa-user icon"></i> À propos de moi</span> <i class="fas fa-chevron-right"></i></button>
-      <div class="accordion-content">
-        <p style="line-height: 1.4;">
-          Passionné d’informatique depuis mon plus jeune âge, j’ai naturellement choisi d’orienter mes études dans ce domaine.<br>
-          J’ai d’abord suivi un Bac SN, qui m’a permis de comprendre plus en profondeur le fonctionnement des systèmes d’information.<br>
-          Je poursuis aujourd’hui un BTS SIO, spécialité SISR, au sein de l’établissement <a href="https://www.ensitech.eu/nos-campus/campus-de-saint-quentin-en-yvelines/?utm_source=google&utm_medium=cpc&utm_campaign=ensitech-sea-marque&utm_id=22089478507&utm_term=ensitech%20montigny&utm_content=172236521999&gad_source=1&gad_campaignid=22089478507&gclid=Cj0KCQjwpv7NBhCzARIsADkIfWwAWrbsVPMA_XMKuRoh63gNGzTLtkx_9DT5sycP3lg8f-TkSZCMnZAaAtNCEALw_wcB" target="_blank" style="color: #94812b; text-decoration: underline;">Ensitech</a>, dans le but de continuer à évoluer dans cette voie.<br>
-          Mes différentes expériences en milieu professionnel ont renforcé ma motivation et m’ont permis d’élargir mes compétences, notamment dans l’assistance aux utilisateurs,
-          ainsi que dans l’administration des systèmes et réseaux.<br>
-          Elles ont également confirmé mon envie de travailler dans un environnement technique où je peux apprendre, résoudre des problèmes et progresser continuellement.
-		  <p style="margin-top: 10px;">
-      <a href="cv_ensitech_victor_trioux_2026.pdf" target="_blank" style="color: #94812b; text-decoration: underline;">Consulter mon CV</a>
-    </p>
-        </p>
-      </div>
-    </section>
-
-    <!-- BTS SIO -->
-    <section id="bts">
-      <button class="accordion-header"><span><i class="fas fa-network-wired icon"></i> BTS SIO</span> <i class="fas fa-chevron-right"></i></button>
-      <div class="accordion-content">
-        <!-- (tout ton texte BTS inchangé ici) -->
-        <!-- Je n’enlève rien, tout est bon -->
-        <p style="line-height: 1.4;">
-		Le BTS Services Informatiques aux Organisations forme à la gestion de réseaux, systèmes, sécurité et maintenance. J’ai choisi l’option SISR (Solutions d’Infrastructure, Systèmes et Réseaux).
-		</p>
-		<p style="line-height: 1.4;">
-		Le BTS SIO (Services Informatiques aux Organisations), option SISR (Solutions d'Infrastructure, Systèmes et Réseaux), est une formation qui prépare les étudiants à devenir des professionnels capables de gérer et d’administrer des infrastructures informatiques et des réseaux au sein des entreprises. Ce diplôme de niveau Bac+2 permet d’acquérir des compétences techniques pointues tout en développant des aptitudes à résoudre des problématiques concrètes liées aux systèmes d'information.
-		</p>
-        <p style="line-height: 1.4;">
-		Le BTS SIO SISR forme des experts en informatique et réseaux, capables de : <br>Mettre en place, administrer et maintenir les infrastructures réseau et système d'une entreprise.
-    Assurer le bon fonctionnement des équipements matériels et logiciels dans le respect des normes de sécurité et de performance.
-    Proposer des solutions adaptées aux besoins de l'entreprise en matière d'infrastructure.
-    Résoudre des incidents et optimiser les systèmes d’information.
-		</p>
-		<p style="line-height: 1.4;">
-		La formation est divisée en plusieurs modules couvrant différents domaines de l'informatique et des réseaux. Parmi les matières principales du programme, on retrouve :<br>Gestion des réseaux et des systèmes : Installation, configuration et gestion de serveurs, de réseaux locaux (LAN) et de réseaux étendus (WAN).
-    Virtualisation et cloud computing : Mise en place et gestion des infrastructures virtuelles et des solutions cloud pour optimiser l'utilisation des ressources.
-    Sécurité informatique : Protection des systèmes et des réseaux face aux attaques, gestion des droits d’accès et des protocoles de sécurité.
-    Systèmes d’exploitation : Maîtrise des systèmes comme Windows Server, Linux, et les solutions de virtualisation.
-    Gestion de projet informatique : Apprentissage de la méthodologie de gestion de projet pour assurer la mise en place d’infrastructures informatiques adaptées aux besoins des clients.
-		</p>
-		<p style="line-height: 1.4;">
-		Au cours de cette formation, les étudiants apprennent à :<br>Installer et configurer des systèmes et des réseaux : Installation de serveurs, gestion des services réseau (DNS, DHCP, FTP, etc.), mise en place de la communication entre machines.
-    Assurer la maintenance des infrastructures : Surveiller la performance des systèmes, gérer les sauvegardes, résoudre les pannes et mettre à jour les logiciels.
-    Mettre en œuvre des solutions de sécurité : Sécuriser les échanges et les données en mettant en place des firewalls, des VPN, et des solutions de détection d’intrusion.
-    Assurer le support technique : Apporter une assistance technique aux utilisateurs, résoudre des problèmes techniques et gérer des incidents liés aux systèmes et réseaux.
-		</p>
-		<p style="line-height: 1.4;">
-		Le BTS SIO SISR ouvre la voie à plusieurs métiers dans le domaine de l’informatique et des réseaux. Les diplômés peuvent travailler en tant que :
-		</p>
-
-    <p>-&nbsp;<a href="https://nextformation.com/fiches-metiers/fiche-metier-administrateur-systeme-et-reseaux" target="_blank" style="color: #94812b; text-decoration: underline;">Administrateur système et réseaux</a></p>
-    <p>-&nbsp;<a href="https://www.hellowork.com/fr-fr/metiers/technicien-support-informatique.html" target="_blank" style="color: #94812b; text-decoration: underline;">Technicien support informatique</a></p>
-	<p>-&nbsp;<a href="https://www.onisep.fr/ressources/univers-metier/metiers/technicien-technicienne-telecoms-et-reseaux" target="_blank" style="color: #94812b; text-decoration: underline;">Technicien réseau</a></p>
-	<p>-&nbsp;<a href="https://careers.societegenerale.com/metiers/it-digital/expert-infrastructures" target="_blank" style="color: #94812b; text-decoration: underline;">Consultant en infrastructures informatiques</a></p>
-   <p>-&nbsp;<a href="https://www.manpower.fr/responsable-informatique" target="_blank" style="color: #94812b; text-decoration: underline;">Responsable informatique au sein d'une PME ou d'une grande entreprise</a></p>
-    <p>-&nbsp;<a href="https://www.hellowork.com/fr-fr/metiers/ingenieur-systemes-et-reseaux.html" target="_blank" style="color: #94812b; text-decoration: underline;">Ingénieur systèmes et réseaux</a></p>      
-      </div>
-    </section>
-
-    <!-- PROJETS -->
-    <section id="projects">
-      <button class="accordion-header"><span><i class="fas fa-laptop-code icon"></i> Mes Projets</span> <i class="fas fa-chevron-right"></i></button>
-      <div class="accordion-content">
-        <p>
-          <a href="tets.html" target="_blank">Tous mes projets</a> 
-        </p>
-
-        <div class="project-gallery">
-          <a href="proe/Installer GLPI sur ubuntu.pdf" target="_blank">
-            <img src="https://www.bujarra.com/wp-content/uploads/2021/09/GLPI-Instalar-00.png?v=1630864335" alt="">
-          </a>
-          <a href="proe/Installation win-srv-ad-dns.pdf" target="_blank">
-            <img src="https://adeo-informatique.fr/wp-content/uploads/2020/01/windows-server-2019-adeo-informatique.png" alt="">
-          </a>
-          <a href="prot/Procédure de création VPN SSL forti.pdf" target="_blank">
-            <img src="https://s3.amazonaws.com/www-itopvpn-com/blog/20230731/1690783438456952.jpeg" alt="">
-          </a>
-          <a href="prot/Pour commencer l’installation de TrueNAS SCALE.pdf" target="_blank">
-            <img src="https://linuxiac.com/wp-content/uploads/2024/06/truenas-scale-docker.jpg" alt="">
-          </a>
-        </div>
-      </div>
-    </section>
-
-     <!-- Section: Veille Hardware -->
-<section id="veille-hardware">
-  <button class="accordion-header"><span><i class="fas fa-microchip"></i> Veille</span> <i class="fas fa-chevron-right"></i></button>
-  <div class="accordion-content">
-    <div class="veille-cards">
-	<p>
-    La veille technologique sur le matériel informatique est essentielle pour suivre l’évolution des composants qui constituent un ordinateur ou un serveur. 
-    Elle permet d’anticiper les besoins futurs, d’optimiser les performances et de faire des choix éclairés pour la conception ou l’amélioration d’un système.
-  </p>
-
-  <p>
-    Chaque composant joue un rôle crucial :
-  </p>
-
-  <ul>
-    <li>CPU (Processeur) : cœur du système, il détermine la vitesse de traitement des tâches et l’efficacité générale de l’ordinateur. La veille sur les processeurs permet de connaître les nouvelles architectures, le nombre de cœurs et la consommation énergétique.</li>
-
-    <li>GPU (Carte graphique) : responsable du rendu visuel et de la puissance pour les applications graphiques, le gaming ou le calcul scientifique. Suivre les dernières générations de GPU aide à choisir la carte la plus adaptée aux besoins spécifiques.</li>
-
-    <li>RAM (Mémoire vive) : influence directement la fluidité et la capacité multitâche. La veille sur la RAM inclut les vitesses, les capacités et la compatibilité avec les nouvelles technologies (DDR4, DDR5…).</li>
-
-    <li>Systèmes de refroidissement : ventirads ou watercooling maintiennent les composants à une température optimale. Le suivi des innovations en refroidissement garantit performance et longévité, surtout dans les configurations puissantes.</li>
-
-    <li>Carte mère : elle relie tous les composants et définit les possibilités d’extension et de compatibilité. La veille permet de choisir des cartes stables, évolutives et adaptées aux nouvelles technologies.</li>
-
-    <li>Disques durs et SSD : le stockage affecte la vitesse d’accès aux données. Suivre les dernières technologies NVMe, SATA et les innovations en capacité et fiabilité permet d’optimiser la performance du système.</li>
-
-    <li>Alimentation : fournit l’énergie nécessaire à l’ensemble des composants. Une alimentation fiable et efficace est indispensable pour éviter les pannes et garantir la stabilité du système.</li>
-  </ul>
-
-  <p>
-    En résumé, cette veille hardware permet de comprendre les tendances, anticiper les évolutions et faire des choix informés, essentiels pour garantir performance, stabilité et durabilité d’un ordinateur ou d’une infrastructure informatique.
-  </p>
-
-    <!-- CPU -->
-    <div class="veille-card">
-      <div class="icon">
-	  <img src="https://media.cdnws.com/_i/3602/1455/2029/59/a-quoi-sert-un-processeur.jpeg" alt="CPU" />
-	  </div>
-       <h3 class="glow-animated">CPU</h3>
-      <p>Suivi des dernières générations de processeurs, performances et architectures.</p>
-      <a href="https://dropreference.com/fr/blog/guide/meilleur-processeur-gaming">En savoir plus</a> <a href="https://www.cpu-monkey.com/fr/"> / Comparer les Processeurs</a>
-    </div>
-
-    <!-- RAM -->
-    <div class="veille-card">
-      <div class="icon">
-	  <img src="https://m.media-amazon.com/images/I/61u+ioPoR1L._AC_SL1080_.jpg" alt="RAM" />
-	  </div>
-      <h3 class="glow-animated">RAM</h3>
-      <p>Suivi des nouvelles mémoires, vitesses, latences et types (DDR4/DDR5).</p>
-      <a href="https://dropreference.com/fr/blog/guide/ddr4-vs-ddr5">En savoir plus</a> 
-    </div>
-
-    <!-- GPU -->
-    <div class="veille-card">
-      <div class="icon">
-	  <img src="https://static.digitecgalaxus.ch/im/Files/7/6/6/0/5/1/4/3/radeon-teaser21.png?impolicy=teaser&resizeWidth=700&resizeHeight=350" alt="GPU" />
-	  </div>
-      <h3 class="glow-animated">GPU</h3>
-      <p>Suivi des cartes graphiques, performances pour gaming, IA et calcul scientifique.</p>
-      <a href="https://dropreference.com/fr/blog/guide/meilleure-carte-graphique">En savoir plus</a>
-    </div>
-
-    <!-- Stockage -->
-    <div class="veille-card">
-      <div class="icon">
-	  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWIc_br2YQrQeNsjtFx9DKGjHmCj6NPNVCEg&s" alt="stockage" />
-	  </div>
-      <h3 class="glow-animated">Stockage</h3>
-      <p>Veille sur SSD NVMe, SATA et HDD, vitesses et technologies RAID.</p>
-      <a href="https://dropreference.com/fr/blog/guide/types-ssd">En savoir plus</a>
-    </div>
-
-    <!-- Clavier -->
-    <div class="veille-card">
-      <div class="icon">
-	  <img src="https://storage-asset.msi.com/global/picture/image/feature/power/MPG/A1000G-product/kv-xs.jpg" alt="PSU" />
-	  </div>
-      <h3 class="glow-animated">PSU</h3>
-      <p>Suivi de l’efficacité énergétique, des certifications 80 PLUS et de la stabilité des alimentations pour protéger les composants.</p>
-      <a href="https://dropreference.com/fr/blog/guide/choix-alimentation-pc">En savoir plus</a>
-    </div>
-
-    <!-- Souris -->
-    <div class="veille-card">
-      <div class="icon">
-	  <img src="https://spacecomputer.fr/wp-content/uploads/2025/10/c6b32834-7b4d-4212-85a8-fb7caa21827e.png" alt="Systeme de refroidissement" />
-	  </div>
-      <h3 class="glow-animated">Systeme de refroidissement</h3>
-      <p>Suivi des ventirads, watercooling et solutions hybrides pour garantir des températures optimales et prolonger la durée de vie des composants.</p>
-      <a href="https://dropreference.com/fr/blog/guide/comparatif-aio">AIO</a>  <a href="https://dropreference.com/fr/blog/guide/refroidissement-ventirad">Ventirad</a>
-    </div>
-	
-	<div class="veille-card">
-      <div class="icon">
-	  <img src="https://www.grosbill.com/images_produits/1be90428-73eb-4eac-9afc-a1f0e5cb057a.jpg" alt="Carte mère" />
-	  </div>
-      <h3 class="glow-animated">Carte mère</h3>
-      <p>Suivi des nouvelles cartes mères, compatibilité CPU/RAM, nombre de ports et possibilités d’extension pour des systèmes performants et évolutifs.</p>
-      <a href="https://dropreference.com/fr/blog/guide/meilleure-carte-m%C3%A8re-gaming">En savoir plus</a>
-    </div>
-	
-	<div class="veille-card">
-      <div class="icon">
-	  <img src="https://www.gravastar.com/cdn/shop/files/gravastar-v60-pro-8khz-magnetic-switch-gaming-keyboard-15.webp?v=1765965816&width=2048" alt="Carte mère" />
-	  </div>
-      <h3 class="glow-animated">Clavier</h3>
-      <p>Suivi sur l’ergonomie, le types de switches mécaniques,magnétique, contruction et matériaux et les fonctionnalités programmables pour optimiser confort et performance.</p>
-      <a href="https://dropreference.com/fr/blog/guide/meilleur-clavier-gamer">En savoir plus</a>
-    </div>
-	
-	<div class="veille-card">
-      <div class="icon">
-	  <img src="https://www.pulsar.gg/cdn/shop/files/Bruce_Lee_85th_Anniversary_X2_CL_Galleryimage_005.jpg?v=1762327039" alt="Carte mère" />
-	  </div>
-      <h3 class="glow-animated">Souris</h3>
-      <p>Suivi de l’ergonomie, des capteurs haute précision et des innovations pour gaming et bureautique.</p>
-      <a href="https://dropreference.com/fr/blog/guide/souris-gamer-sans-fil">En savoir plus</a>
-    </div>
-	
-	<div class="veille-card">
-      <div class="icon">
-	  <img src="https://www.cybertek.fr/images_produits/2093f0b0-6863-4834-9bc9-a8534a12f447.jpg" alt="Carte mère" />
-	  </div>
-      <h3 class="glow-animated">Ecran</h3>
-      <p>Suivi des  résolutions, la fréquences, des technologies des dalles et les fonctionnalités pour le confort visuel et la productivité.</p>
-      <a href="https://dropreference.com/fr/blog/guide/ecran-gaming">En savoir plus</a>
-    </div>
+<!-- STICKY NAV -->
+<nav class="sticky-nav">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-brand">VT://</a>
+    <ul class="nav-links">
+      <li><a href="#about">À propos</a></li>
+      <li><a href="#bts">BTS SIO</a></li>
+      <li><a href="#projects">Projets</a></li>
+      <li><a href="#veille-hardware">Veille</a></li>
+      <li><a href="#entreprise">Entreprise</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
   </div>
+</nav>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <div id="hero" class="hero">
+    <div class="hero-badge">// PORTFOLIO — BTS SIO SISR</div>
+    <h1><span>Victor</span> Trioux</h1>
+    <p class="hero-sub">Étudiant en BTS SIO — Option SISR · Alternant chez Tersedia</p>
+    <div class="hero-meta">
+      <div class="meta-chip"><span class="dot"></span> BTS SIO — Option SISR</div>
+      <div class="meta-chip"><span class="dot"></span> Alternance · Tersedia</div>
+      <div class="meta-chip"><span class="dot"></span> Ensitech · 2024–2026</div>
     </div>
-</section>
-	
-	<section id="entreprise">
-      <button class="accordion-header"><span><i class="fa-regular fa-building"></i></i> Entreprise</span> <i class="fas fa-chevron-right"></i></button>
-      <div class="accordion-content">
-        <!-- (tout ton texte entreprise inchangé ici) -->
-        <p style="line-height: 1.4;">
-		Je réalise mon alternance au seins de l'entreprise <a href="https://tersedia.fr/" target="_blank">Tersedia</a>, une entreprise specialisé dans conseil en systèmes et logiciels informatiques,l'entreprise a été fondé le 1er septembre 1996. Tersedia est une petite 
-		SAS de 50 à 100 personnes (PME),le chiffre d'affaire serait de aproximativement 12,94 M d'euros en 2023 celons infonet.<br>Tersedia se positionne comme un partenaire de confiance pour les entreprises ayant des problématiques informatiques complexes. 
-		Elle veut transformer les “centres de coût” IT en accélérateurs de performance. Elle met l’accent sur des infrastructures multicloud, sécurisées dès la conception, et sur la résilience cyber. L’ambition : 
-		servir les PME et ETI avec des solutions “sur-mesure premium”, certifiées et robustes, tout en maintenant une relation de proximité. mais offre aussi bien d'autre services IT comme :
-		<br> <br> <a href="https://tersedia.fr/it-as-a-service/" target="_blank">IT-as-a-Service</a> :<br>
-		<br> - Infrastructure managée (serveurs, firewalls, messagerie, wifi, etc.) totalement prise en charge par Tersedia.<br>- Permet aux clients de se décharger de la gestion IT et de se concentrer sur leur cœur de métier.
-		</p>
-		<p style="line-height: 1.4;">
-		<a href="https://tersedia.fr/infrastructure-secured-by-design/" target="_blank">Infrastructure Secured by Design :</a> <br> <br> - Déploiements “on premise”, cloud privé, cloud public ou hybride, toujours avec une conception “sécurité par défaut”. <br>
-		- Supervision, sauvegarde, redondance pour garantir la performance et la continuité.
-		</p>
-        <p style="line-height: 1.4;">
-		<a href="https://tersedia.fr/cyber-soc/" target="_blank">Cyber SOC :</a> <br> <br> - Centre de supervision de la sécurité opérationnelle : surveillance des identités, des endpoints, des réseaux, des messageries, etc.<br>- Détection, réponse aux incidents, gestion proactive des menaces. 
-		</p>
-		<p style="line-height: 1.4;">
-		<a href="https://tersedia.fr/services-manages/" target="_blank">Services managés :</a> <br> <br> - Support N1, N2, N3, patch management, exploitation des infrastructures. <br>- Centre de services situé à Chatou, escalade interne rapide et support 24/7 selon les contrats.
-		</p>
-		<p style="line-height: 1.4;">
-		<a href="https://tersedia.fr/professional-services/" target="_blank">Professional Services :</a> <br> <br>- Audit, design d’architecture, migration, intégration, support, transfert de compétences. <br>- Expertise forte sur la virtualisation, le stockage, les systèmes, la messagerie et la sécurité.
-		</p>
-		<p style="line-height: 1.4;">
-		Pour renforcer la confiance de ses clients et garantir un haut niveau de sécurité, Tersedia s’appuie sur plusieurs certifications et labels reconnus dans le domaine de la cybersécurité. L’entreprise est notamment certifiée ISO 27001, 
-		attestant de la mise en place d’un système de management de la sécurité de l’information mature et rigoureux. Elle dispose également de la certification HDS (Hébergeur de Données de Santé), indispensable pour traiter et héberger des données sensibles dans le secteur médical, 
-		garantissant un niveau de protection particulièrement élevé. <br>
-        En parallèle, Tersedia a obtenu le label ExpertCyber, délivré par l’ANSSI, qui reconnaît son expertise technique et sa capacité à accompagner les organisations dans la sécurisation de leurs systèmes d’information. Enfin, l’entreprise est membre du groupement Hexatrust, 
-        un écosystème regroupant les acteurs français de référence dans le cloud de confiance et la cybersécurité, ce qui renforce sa légitimité et son positionnement sur le marché.
-		</p>
-		<p style="line-height: 1.4;">
-		Dans le cadre de sa croissance, Tersedia a mené plusieurs opérations stratégiques. En 2016, l’entreprise a fusionné avec Res.sources, un prestataire d’infogérance avec lequel elle collaborait déjà étroitement, ce qui a renforcé ses capacités en services managés.
-		Plus récemment, en 2024-2025, Tersedia a acquis Kerberos, une société spécialisée en réseaux et cybersécurité. Cette acquisition apporte une expertise avancée, notamment sur les technologies Fortinet, et permet d’intégrer une équipe qualifiée directement dans les 
-		locaux de Tersedia à Chatou.<br>
-        Ces opérations, combinées à sa croissance organique, s’inscrivent dans l’ambition de l’entreprise de doubler son chiffre d’affaires tous les trois ans tout en renforçant son positionnement dans l’infrastructure et la cybersécurité.
-		</p>
-		<p style="line-height: 1.4;">
-		Tersedia bénéficie d’une réputation solide auprès de ses clients, qui soulignent sa stabilité, sa réactivité et la qualité de son accompagnement. L’entreprise s’appuie sur de nombreux partenariats technologiques avec des acteurs majeurs du marché tels que HPE, 
-		Dell, Microsoft, VMware, Sekoia.io ou encore HarfangLab, ce qui lui permet de proposer des solutions performantes et adaptées aux besoins des organisations.<br>
-        Son modèle économique repose sur des forfaits transparents, notamment pour les services managés, l’IT-as-a-Service et la cybersécurité, garantissant une tarification claire et sans surprise. Enfin, l’implantation de son centre de services à Chatou offre une vraie
-		proximité avec ses clients et permet des interventions rapides grâce à une forte réactivité opérationnelle.
-		</p>
-		<p style="line-height: 1.4;">
-		Au sein de Tersedia, j’occupe le poste de technicien systèmes et réseaux, intégré au centre de services dédié au support utilisateur. Cette expérience m’a permis d’intervenir quotidiennement sur des environnements techniques variés et exigeants, tout en apportant
-		une assistance directe aux collaborateurs des clients de l’entreprise. Mon rôle consistait principalement à diagnostiquer et résoudre les incidents liés aux postes de travail, aux applications métiers, aux problèmes réseau ainsi qu’aux environnements virtualisés 
-		ou serveurs.<br>J’étais également chargé d’assurer le suivi des tickets via l'outils de supervision PRTG, de réaliser des opérations de maintenance préventive, de préparer et configurer du matériel (postes, périphériques, comptes utilisateurs) et de contribuer 
-		à la continuité de service en appliquant les bonnes pratiques internes. Cette mission m’a permis de renforcer mes compétences techniques, d’améliorer ma capacité d’analyse et d’être confronté à des situations réelles nécessitant rigueur et réactivité.
-		</p>
-        Dans le cadre de mon poste de technicien systèmes et réseaux au sein de Tersedia, j’ai été amené à traiter un large éventail de tickets, allant du simple incident utilisateur aux interventions plus techniques sur l’infrastructure. Voici quelques exemples
-		représentatifs des tickets que j’ai pu prendre en charge :<br> <br>
-		<div class="project-gallery">
-          <a href="https://tersedia.freshservice.com/a/tickets/79382?current_tab=details" target="_blank">
-            <img src="https://i.ytimg.com/vi/vCp0gpsV95E/maxresdefault.jpg" alt="">
-          </a>
-          <a href="https://tersedia.freshservice.com/a/tickets/77460?current_tab=details" target="_blank">
-            <img src="https://support.ricoh.com/bb_v1oi/pub_e/oi_view/0001079/0001079426/view/intro/image/brc2int-en043.gif" alt="">
-          </a>
-          <a href="https://tersedia.freshservice.com/a/tickets/74882?current_tab=details" target="_blank">
-            <img src="https://ircf.fr/files/2018/08/google-et-facebook-escroquerie-phishing-100-millions-dollars.jpg" alt="">
-          </a>
-          <a href="https://tersedia.freshservice.com/a/tickets/68645?current_tab=details" target="_blank">
-            <img src="https://learn-attachment.microsoft.com/api/attachments/b8358ecc-5807-4a46-82c4-e3a65bea6d04?platform=QnA" alt="">
-          </a>
-		  <a href="https://tersedia.freshservice.com/a/tickets/65580?current_tab=details" target="_blank">
-            <img src="https://community.fortinet.com/legacyfs/online/images/kb_17955_2.png" alt="">
+    <div class="hero-line"></div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about" class="content-section reveal">
+    <div class="section-label">01 — À propos</div>
+    <h2 class="section-title">Qui suis-je ?</h2>
+    <div class="about-layout">
+      <div class="about-text">
+        <p>Passionné d'informatique depuis mon plus jeune âge, j'ai naturellement choisi d'orienter mes études dans ce domaine. J'ai d'abord suivi un Bac SN, qui m'a permis de comprendre plus en profondeur le fonctionnement des systèmes d'information.</p>
+        <p>Je poursuis aujourd'hui un BTS SIO, spécialité SISR, au sein de l'établissement <a href="https://www.ensitech.eu/nos-campus/campus-de-saint-quentin-en-yvelines/?utm_source=google&utm_medium=cpc&utm_campaign=ensitech-sea-marque&utm_id=22089478507&utm_term=ensitech%20montigny&utm_content=172236521999&gad_source=1&gad_campaignid=22089478507&gclid=Cj0KCQjwpv7NBhCzARIsADkIfWwAWrbsVPMA_XMKuRoh63gNGzTLtkx_9DT5sycP3lg8f-TkSZCMnZAaAtNCEALw_wcB" target="_blank">Ensitech</a>, dans le but de continuer à évoluer dans cette voie.</p>
+        <p>Mes différentes expériences en milieu professionnel ont renforcé ma motivation et m'ont permis d'élargir mes compétences, notamment dans l'assistance aux utilisateurs, ainsi que dans l'administration des systèmes et réseaux.</p>
+        <p>Elles ont également confirmé mon envie de travailler dans un environnement technique où je peux apprendre, résoudre des problèmes et progresser continuellement.</p>
+      </div>
+      <div class="about-sidebar">
+        <div class="cv-card">
+          <div class="cv-card-icon"><i class="fas fa-file-pdf"></i></div>
+          <h4>Mon Curriculum Vitae</h4>
+          <a href="cv_ensitech_victor_trioux_2026.pdf" target="_blank" class="btn-cv">
+            <i class="fas fa-download"></i> Télécharger le CV
           </a>
         </div>
+        <div class="info-card">
+          <div class="info-row"><i class="fas fa-graduation-cap"></i><span>BTS SIO — SISR</span></div>
+          <div class="info-row"><i class="fas fa-building"></i><span>Ensitech · Montigny</span></div>
+          <div class="info-row"><i class="fas fa-briefcase"></i><span>Alternant · Tersedia</span></div>
+          <div class="info-row"><i class="fas fa-map-marker-alt"></i><span>Chatou, Île-de-France</span></div>
+          <div class="info-row"><i class="fas fa-calendar"></i><span>Promo 2024–2026</span></div>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- FOOTER -->
-    <footer class="footer-large">
+  <!-- BTS SIO -->
+  <section id="bts" class="content-section reveal">
+    <div class="section-label">02 — Formation</div>
+    <h2 class="section-title">BTS SIO — SISR</h2>
+    <div class="bts-grid">
+      <div class="bts-block full">
+        <h4>// présentation</h4>
+        <p>Le BTS SIO (Services Informatiques aux Organisations), option SISR (Solutions d'Infrastructure, Systèmes et Réseaux), est une formation qui prépare les étudiants à devenir des professionnels capables de gérer et d'administrer des infrastructures informatiques et des réseaux au sein des entreprises. Ce diplôme de niveau Bac+2 permet d'acquérir des compétences techniques pointues tout en développant des aptitudes à résoudre des problématiques concrètes liées aux systèmes d'information.</p>
+      </div>
+      <div class="bts-block">
+        <h4>// compétences</h4>
+        <p>Mettre en place, administrer et maintenir les infrastructures réseau et système. Assurer le bon fonctionnement des équipements matériels et logiciels dans le respect des normes de sécurité. Proposer des solutions adaptées aux besoins de l'entreprise. Résoudre des incidents et optimiser les systèmes d'information. Assurer le support technique aux utilisateurs.</p>
+      </div>
+      <div class="bts-block">
+        <h4>// matières principales</h4>
+        <p>Gestion des réseaux et systèmes (LAN, WAN, DNS, DHCP, FTP). Virtualisation et cloud computing. Sécurité informatique : firewalls, VPN, détection d'intrusion. Systèmes d'exploitation : Windows Server, Linux. Gestion de projet informatique et méthodologie. Maintenance préventive et curative des infrastructures.</p>
+      </div>
+    </div>
+    <p class="career-label">// débouchés métiers</p>
+    <div class="career-grid">
+      <a href="https://nextformation.com/fiches-metiers/fiche-metier-administrateur-systeme-et-reseaux" target="_blank" class="career-link">Administrateur système et réseaux</a>
+      <a href="https://www.hellowork.com/fr-fr/metiers/technicien-support-informatique.html" target="_blank" class="career-link">Technicien support informatique</a>
+      <a href="https://www.onisep.fr/ressources/univers-metier/metiers/technicien-technicienne-telecoms-et-reseaux" target="_blank" class="career-link">Technicien réseau</a>
+      <a href="https://careers.societegenerale.com/metiers/it-digital/expert-infrastructures" target="_blank" class="career-link">Consultant en infrastructures</a>
+      <a href="https://www.manpower.fr/responsable-informatique" target="_blank" class="career-link">Responsable informatique PME/ETI</a>
+      <a href="https://www.hellowork.com/fr-fr/metiers/ingenieur-systemes-et-reseaux.html" target="_blank" class="career-link">Ingénieur systèmes et réseaux</a>
+    </div>
+  </section>
+
+  <!-- PROJETS -->
+  <section id="projects" class="content-section reveal">
+    <div class="section-label">03 — Projets E5</div>
+    <h2 class="section-title">Mes Projets</h2>
+    <p class="projects-intro">
+      Retrouvez mes projets réalisés en BTS SIO. Cliquez sur une image pour accéder au document associé.
+      <a href="tets.html" target="_blank">Voir tous les projets →</a>
+    </p>
+    <div class="project-gallery">
+      <a href="proe/Installer GLPI sur ubuntu.pdf" target="_blank">
+        <img src="https://www.bujarra.com/wp-content/uploads/2021/09/GLPI-Instalar-00.png?v=1630864335" alt="GLPI">
+      </a>
+      <a href="proe/Installation win-srv-ad-dns.pdf" target="_blank">
+        <img src="https://adeo-informatique.fr/wp-content/uploads/2020/01/windows-server-2019-adeo-informatique.png" alt="Windows Server">
+      </a>
+      <a href="prot/Procédure de création VPN SSL forti.pdf" target="_blank">
+        <img src="https://s3.amazonaws.com/www-itopvpn-com/blog/20230731/1690783438456952.jpeg" alt="VPN">
+      </a>
+      <a href="prot/Pour commencer l'installation de TrueNAS SCALE.pdf" target="_blank">
+        <img src="https://linuxiac.com/wp-content/uploads/2024/06/truenas-scale-docker.jpg" alt="TrueNAS">
+      </a>
+    </div>
+  </section>
+
+  <!-- VEILLE HARDWARE -->
+  <section id="veille-hardware" class="content-section reveal">
+    <div class="section-label">04 — Veille technologique</div>
+    <h2 class="section-title">Veille Hardware</h2>
+    <div class="veille-intro">
+      <p>La veille technologique sur le matériel informatique est essentielle pour suivre l'évolution des composants qui constituent un ordinateur ou un serveur. Elle permet d'anticiper les besoins futurs, d'optimiser les performances et de faire des choix éclairés pour la conception ou l'amélioration d'un système.</p>
+      <p>Chaque composant joue un rôle crucial :</p>
+      <ul>
+        <li>CPU (Processeur) : cœur du système, il détermine la vitesse de traitement des tâches et l'efficacité générale de l'ordinateur.</li>
+        <li>GPU (Carte graphique) : responsable du rendu visuel et de la puissance pour les applications graphiques, le gaming ou le calcul scientifique.</li>
+        <li>RAM (Mémoire vive) : influence directement la fluidité et la capacité multitâche. La veille inclut les vitesses, capacités et compatibilité (DDR4, DDR5…).</li>
+        <li>Systèmes de refroidissement : ventirads ou watercooling maintiennent les composants à une température optimale.</li>
+        <li>Carte mère : elle relie tous les composants et définit les possibilités d'extension et de compatibilité.</li>
+        <li>Disques durs et SSD : le stockage affecte la vitesse d'accès aux données (NVMe, SATA, RAID).</li>
+        <li>Alimentation : fournit l'énergie nécessaire à l'ensemble des composants de façon stable et fiable.</li>
+      </ul>
+    </div>
+    <div class="veille-grid">
+      <div class="veille-card">
+        <div class="icon"><img src="https://media.cdnws.com/_i/3602/1455/2029/59/a-quoi-sert-un-processeur.jpeg" alt="CPU"/></div>
+        <h3>CPU</h3><p>Suivi des dernières générations de processeurs, performances et architectures.</p>
+        <a href="https://dropreference.com/fr/blog/guide/meilleur-processeur-gaming">En savoir plus</a><a href="https://www.cpu-monkey.com/fr/"> / Comparer</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://m.media-amazon.com/images/I/61u+ioPoR1L._AC_SL1080_.jpg" alt="RAM"/></div>
+        <h3>RAM</h3><p>Suivi des nouvelles mémoires, vitesses, latences et types (DDR4/DDR5).</p>
+        <a href="https://dropreference.com/fr/blog/guide/ddr4-vs-ddr5">En savoir plus</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://static.digitecgalaxus.ch/im/Files/7/6/6/0/5/1/4/3/radeon-teaser21.png?impolicy=teaser&resizeWidth=700&resizeHeight=350" alt="GPU"/></div>
+        <h3>GPU</h3><p>Suivi des cartes graphiques, performances pour gaming, IA et calcul scientifique.</p>
+        <a href="https://dropreference.com/fr/blog/guide/meilleure-carte-graphique">En savoir plus</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWIc_br2YQrQeNsjtFx9DKGjHmCj6NPNVCEg&s" alt="Stockage"/></div>
+        <h3>Stockage</h3><p>Veille sur SSD NVMe, SATA et HDD, vitesses et technologies RAID.</p>
+        <a href="https://dropreference.com/fr/blog/guide/types-ssd">En savoir plus</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://storage-asset.msi.com/global/picture/image/feature/power/MPG/A1000G-product/kv-xs.jpg" alt="PSU"/></div>
+        <h3>PSU</h3><p>Suivi de l'efficacité énergétique, certifications 80 PLUS et stabilité des alimentations.</p>
+        <a href="https://dropreference.com/fr/blog/guide/choix-alimentation-pc">En savoir plus</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://spacecomputer.fr/wp-content/uploads/2025/10/c6b32834-7b4d-4212-85a8-fb7caa21827e.png" alt="Refroidissement"/></div>
+        <h3>Refroidissement</h3><p>Suivi des ventirads, watercooling et solutions hybrides pour des températures optimales.</p>
+        <a href="https://dropreference.com/fr/blog/guide/comparatif-aio">AIO</a><a href="https://dropreference.com/fr/blog/guide/refroidissement-ventirad"> Ventirad</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://www.grosbill.com/images_produits/1be90428-73eb-4eac-9afc-a1f0e5cb057a.jpg" alt="Carte mère"/></div>
+        <h3>Carte mère</h3><p>Suivi des nouvelles cartes mères, compatibilité CPU/RAM, nombre de ports et possibilités d'extension.</p>
+        <a href="https://dropreference.com/fr/blog/guide/meilleure-carte-m%C3%A8re-gaming">En savoir plus</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://www.gravastar.com/cdn/shop/files/gravastar-v60-pro-8khz-magnetic-switch-gaming-keyboard-15.webp?v=1765965816&width=2048" alt="Clavier"/></div>
+        <h3>Clavier</h3><p>Suivi sur l'ergonomie, types de switches mécaniques/magnétiques et fonctionnalités programmables.</p>
+        <a href="https://dropreference.com/fr/blog/guide/meilleur-clavier-gamer">En savoir plus</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://www.pulsar.gg/cdn/shop/files/Bruce_Lee_85th_Anniversary_X2_CL_Galleryimage_005.jpg?v=1762327039" alt="Souris"/></div>
+        <h3>Souris</h3><p>Suivi de l'ergonomie, des capteurs haute précision et des innovations pour gaming et bureautique.</p>
+        <a href="https://dropreference.com/fr/blog/guide/souris-gamer-sans-fil">En savoir plus</a>
+      </div>
+      <div class="veille-card">
+        <div class="icon"><img src="https://www.cybertek.fr/images_produits/2093f0b0-6863-4834-9bc9-a8534a12f447.jpg" alt="Ecran"/></div>
+        <h3>Ecran</h3><p>Suivi des résolutions, fréquences, technologies des dalles et fonctionnalités pour le confort visuel.</p>
+        <a href="https://dropreference.com/fr/blog/guide/ecran-gaming">En savoir plus</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENTREPRISE -->
+  <section id="entreprise" class="content-section reveal">
+    <div class="section-label">05 — Entreprise</div>
+    <h2 class="section-title">Tersedia</h2>
+    <div class="certs-row">
+      <span class="cert-badge">ISO 27001</span>
+      <span class="cert-badge">HDS</span>
+      <span class="cert-badge">ExpertCyber · ANSSI</span>
+      <span class="cert-badge">Hexatrust</span>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <h4><a href="https://tersedia.fr/it-as-a-service/" target="_blank">IT-as-a-Service</a></h4>
+        <p>Infrastructure managée (serveurs, firewalls, messagerie, wifi) totalement prise en charge. Permet aux clients de se concentrer sur leur cœur de métier.</p>
+      </div>
+      <div class="service-card">
+        <h4><a href="https://tersedia.fr/infrastructure-secured-by-design/" target="_blank">Infrastructure Secured by Design</a></h4>
+        <p>Déploiements on premise, cloud privé, cloud public ou hybride avec une conception "sécurité par défaut". Supervision, sauvegarde et redondance.</p>
+      </div>
+      <div class="service-card">
+        <h4><a href="https://tersedia.fr/cyber-soc/" target="_blank">Cyber SOC</a></h4>
+        <p>Surveillance des identités, endpoints, réseaux et messageries. Détection, réponse aux incidents et gestion proactive des menaces.</p>
+      </div>
+      <div class="service-card">
+        <h4><a href="https://tersedia.fr/services-manages/" target="_blank">Services Managés</a></h4>
+        <p>Support N1, N2, N3, patch management, exploitation des infrastructures. Centre de services à Chatou, support 24/7 selon les contrats.</p>
+      </div>
+      <div class="service-card">
+        <h4><a href="https://tersedia.fr/professional-services/" target="_blank">Professional Services</a></h4>
+        <p>Audit, design d'architecture, migration, intégration et transfert de compétences. Expertise sur la virtualisation, stockage, systèmes et sécurité.</p>
+      </div>
+    </div>
+    <div class="entreprise-text">
+      <p>Je réalise mon alternance au sein de l'entreprise <a href="https://tersedia.fr/" target="_blank">Tersedia</a>, une SAS de 50 à 100 personnes spécialisée dans le conseil en systèmes et logiciels informatiques, fondée le 1er septembre 1996. Tersedia se positionne comme un partenaire de confiance pour les entreprises ayant des problématiques informatiques complexes, avec un chiffre d'affaires d'approximativement 12,94 M d'euros en 2023.</p>
+      <p>Dans le cadre de sa croissance, Tersedia a fusionné avec Res.sources en 2016, puis a acquis Kerberos en 2024-2025, une société spécialisée en réseaux et cybersécurité avec une expertise avancée sur les technologies Fortinet. Ces opérations s'inscrivent dans l'ambition de l'entreprise de doubler son chiffre d'affaires tous les trois ans. Tersedia bénéficie de partenariats technologiques majeurs : HPE, Dell, Microsoft, VMware, Sekoia.io et HarfangLab.</p>
+      <p>Au sein de Tersedia, j'occupe le poste de technicien systèmes et réseaux au centre de services. Mon rôle consiste à diagnostiquer et résoudre les incidents liés aux postes de travail, aux applications métiers, aux problèmes réseau et aux environnements virtualisés. J'assure également le suivi des tickets via PRTG, la maintenance préventive, la préparation du matériel et la gestion des comptes utilisateurs.</p>
+    </div>
+    <p class="tickets-label">// exemples de tickets traités</p>
+    <div class="ticket-gallery">
+      <a href="https://tersedia.freshservice.com/a/tickets/79382?current_tab=details" target="_blank">
+        <img src="https://i.ytimg.com/vi/vCp0gpsV95E/maxresdefault.jpg" alt="">
+      </a>
+      <a href="https://tersedia.freshservice.com/a/tickets/77460?current_tab=details" target="_blank">
+        <img src="https://support.ricoh.com/bb_v1oi/pub_e/oi_view/0001079/0001079426/view/intro/image/brc2int-en043.gif" alt="">
+      </a>
+      <a href="https://tersedia.freshservice.com/a/tickets/74882?current_tab=details" target="_blank">
+        <img src="https://ircf.fr/files/2018/08/google-et-facebook-escroquerie-phishing-100-millions-dollars.jpg" alt="">
+      </a>
+      <a href="https://tersedia.freshservice.com/a/tickets/68645?current_tab=details" target="_blank">
+        <img src="https://learn-attachment.microsoft.com/api/attachments/b8358ecc-5807-4a46-82c4-e3a65bea6d04?platform=QnA" alt="">
+      </a>
+      <a href="https://tersedia.freshservice.com/a/tickets/65580?current_tab=details" target="_blank">
+        <img src="https://community.fortinet.com/legacyfs/online/images/kb_17955_2.png" alt="">
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer-large">
     <section id="contact">
-  <h2><i class="fas fa-envelope icon"></i> Me Contacter</h2>
-
-  <form id="contactForm" class="contact-form">
-    <label>Nom :</label>
-    <input type="text" name="name" required>
-
-    <label>Email :</label>
-    <input type="email" name="email" required>
-
-    <label>Message :</label>
-    <textarea name="message" rows="5" required></textarea>
-
-    <button type="submit">Envoyer</button>
-  </form>
-</section>
-
-      <div class="footer-container">
-        <div class="footer-col">
-          <h3>À propos</h3>
-          <p>Étudiant en BTS SIO SISR chez Ensitech, alternant chez Tersedia.</p>
-        </div>
-
-        <div class="footer-col">
-          <h3>Contact</h3>
-          <p>Email Pro: victor.trioux@ensitech.eu</p>
-          <p>Email : victor.trioux@gmail.com</p>
-        </div>
-
-        <div class="footer-col">
-          <h3>Réseaux</h3>
-          <a href="https://www.linkedin.com/in/ton-profil" target="_blank">
-            <p><i class="fab fa-linkedin"></i> LinkedIn</p>
-          </a>
-          <a href="https://github.com/ton-pseudo" target="_blank">
-            <p><i class="fab fa-github"></i> GitHub</p>
-          </a>
-        </div>
+      <h2><i class="fas fa-envelope"></i> Me Contacter</h2>
+      <form id="contactForm" class="contact-form">
+        <label>Nom :</label>
+        <input type="text" name="name" required>
+        <label>Email :</label>
+        <input type="email" name="email" required>
+        <label>Message :</label>
+        <textarea name="message" rows="5" required></textarea>
+        <button type="submit">Envoyer</button>
+      </form>
+    </section>
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>À propos</h3>
+        <p>Étudiant en BTS SIO SISR chez Ensitech, alternant chez Tersedia.</p>
       </div>
-      <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
-    </footer>
+      <div class="footer-col">
+        <h3>Contact</h3>
+        <p>Email Pro: victor.trioux@ensitech.eu</p>
+        <p>Email : victor.trioux@gmail.com</p>
+      </div>
+      <div class="footer-col">
+        <h3>Réseaux</h3>
+        <a href="https://www.linkedin.com/in/ton-profil" target="_blank"><p><i class="fab fa-linkedin"></i> LinkedIn</p></a>
+        <a href="https://github.com/ton-pseudo" target="_blank"><p><i class="fab fa-github"></i> GitHub</p></a>
+      </div>
+    </div>
+    <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
+  </footer>
 
-  </div> <!-- FIN OVERLAY -->
+</div>
 
-  <script>
-    function openTab(evt, tabName) {
-      const tabcontent = document.getElementsByClassName("tab-content");
-      const tabbuttons = document.getElementsByClassName("tab-button");
-
-      for (let i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].classList.remove("active");
-      }
-      for (let i = 0; i < tabbuttons.length; i++) {
-        tabbuttons[i].classList.remove("active");
-      }
-
-      document.getElementById(tabName).classList.add("active");
-      evt.currentTarget.classList.add("active");
-    }
-
-    document.querySelectorAll(".accordion-header").forEach(header => {
-      header.addEventListener("click", () => {
-        header.classList.toggle("active");
-        const content = header.nextElementSibling;
-        content.classList.toggle("open");
-      });
+<script>
+  /* MATRIX RAIN */
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()[]{}<>/\\|アイウエオカキクケコサシスセソ';
+  let drops = [];
+  function initMatrix() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drops = Array.from({ length: Math.floor(canvas.width / 16) }, () => Math.random() * -100);
+  }
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(5,10,18,0.04)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00e6b4';
+    ctx.font = '13px Share Tech Mono, monospace';
+    drops.forEach((y, i) => {
+      ctx.fillText(chars[Math.floor(Math.random() * chars.length)], i * 16, y * 16);
+      if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      else drops[i] += 0.5;
     });
-  </script>
+  }
+  initMatrix();
+  window.addEventListener('resize', initMatrix);
+  setInterval(drawMatrix, 50);
+
+  /* SCROLL REVEAL */
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  /* NAV SCROLLSPY */
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const spyObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-52px 0px 0px 0px' });
+  document.querySelectorAll('section[id], div[id]').forEach(s => spyObs.observe(s));
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
-  emailjs.init("2dE9BEMZF-ALEt9Mo"); // ton User ID EmailJS
-
-  document.getElementById('contactForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
+  emailjs.init("2dE9BEMZF-ALEt9Mo");
+  document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
     emailjs.sendForm('service_312kchb', 'template_po9pcw9', this)
-      .then(() => {
-        alert('Message envoyé !');
-        this.reset(); // vide le formulaire
-      }, (error) => {
-        alert('Erreur : ' + JSON.stringify(error));
-      });
+      .then(() => { alert('Message envoyé !'); this.reset(); },
+            (err) => { alert('Erreur : ' + JSON.stringify(err)); });
   });
 </script>
-
 
 </body>
 </html>
