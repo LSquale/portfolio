@@ -78,6 +78,45 @@
     .meta-chip .dot { width:5px; height:5px; background:var(--green); border-radius:50%; box-shadow:0 0 6px var(--green); animation:pulse 2s infinite; }
     .hero-line { width:120px; height:2px; background:linear-gradient(90deg,transparent,var(--green),transparent); margin:36px auto 0; }
 
+    /* ── TABLEAU E5 BANNER ── */
+    .tableau-banner {
+      display:grid; grid-template-columns:auto 1fr auto; gap:24px; align-items:center;
+      background:var(--panel); border:1px solid rgba(0,230,180,.35);
+      border-left:4px solid var(--green); border-radius:8px;
+      padding:28px 32px; backdrop-filter:blur(12px);
+      margin-bottom:60px; position:relative; overflow:hidden;
+      text-decoration:none; transition:border-color .3s, box-shadow .3s, transform .3s;
+    }
+    .tableau-banner::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 0% 50%, rgba(0,230,180,.06) 0%, transparent 55%);
+      pointer-events:none;
+    }
+    .tableau-banner:hover { border-color:rgba(0,230,180,.6); box-shadow:0 8px 40px rgba(0,230,180,.12); transform:translateY(-2px); }
+    .tableau-icon {
+      width:56px; height:56px; border-radius:6px; flex-shrink:0;
+      background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.3);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem; color:var(--green); position:relative;
+    }
+    .tableau-body { position:relative; }
+    .tableau-eyebrow { font-family:var(--mono); font-size:.65rem; letter-spacing:.22em; color:var(--green); text-transform:uppercase; margin-bottom:6px; }
+    .tableau-title { font-family:var(--head); font-size:1.25rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+    .tableau-desc { font-size:.85rem; color:var(--muted); line-height:1.6; }
+    .tableau-cta {
+      display:inline-flex; align-items:center; gap:8px; flex-shrink:0; position:relative;
+      font-family:var(--mono); font-size:.72rem; letter-spacing:.15em; text-transform:uppercase;
+      color:var(--green); background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35);
+      padding:10px 20px; border-radius:4px; white-space:nowrap;
+      transition:background .25s, box-shadow .25s, gap .2s;
+    }
+    .tableau-banner:hover .tableau-cta { background:rgba(0,230,180,.18); box-shadow:0 0 20px rgba(0,230,180,.15); gap:12px; }
+    @media(max-width:640px) {
+      .tableau-banner { grid-template-columns:1fr; }
+      .tableau-icon { display:none; }
+      .tableau-cta { justify-self:start; }
+    }
+
     /* ── SECTION LABELS ── */
     .section-label {
       font-family:var(--mono); font-size:.7rem; letter-spacing:.25em; color:var(--green);
@@ -144,30 +183,59 @@
     .project-gallery img { width:100%; height:140px; object-fit:cover; display:block; filter:brightness(.8) saturate(.75); transition:filter .3s; }
     .project-gallery a:hover img { filter:brightness(1) saturate(1); }
 
-    /* ── VEILLE ── */
-    .veille-intro {
-      background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--green);
-      border-radius:6px; padding:24px 28px; backdrop-filter:blur(10px); margin-bottom:20px;
+    /* ── VEILLE LINK CARD ── */
+    .veille-link-card {
+      background:var(--panel); border:1px solid var(--border); border-radius:8px;
+      padding:48px 40px; backdrop-filter:blur(12px);
+      display:grid; grid-template-columns:1fr auto; gap:32px; align-items:center;
+      transition:border-color .3s, box-shadow .3s;
+      position:relative; overflow:hidden;
     }
-    .veille-intro p { font-size:.92rem; color:var(--text); line-height:1.85; margin-bottom:10px; }
-    .veille-intro ul { list-style:none; display:flex; flex-direction:column; gap:6px; margin-top:8px; padding-left:0; }
-    .veille-intro li { font-size:.88rem; color:var(--text); padding-left:16px; position:relative; line-height:1.7; }
-    .veille-intro li::before { content:'▸'; color:var(--green); position:absolute; left:0; }
-    .veille-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:14px; }
-    .veille-card {
-      background:rgba(8,18,38,.85); border:1px solid var(--border); border-radius:6px; padding:18px;
-      display:grid; grid-template-columns:72px 1fr; gap:0 14px; align-items:start;
-      transition:border-color .3s, transform .3s, box-shadow .3s;
+    .veille-link-card::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 0% 50%, rgba(0,230,180,.05) 0%, transparent 60%);
+      pointer-events:none;
     }
-    .veille-card:hover { border-color:rgba(0,230,180,.4); transform:translateY(-3px); box-shadow:0 6px 28px rgba(0,230,180,.08); }
-    .veille-card .icon { grid-column:1; grid-row:1/span 10; width:72px; height:72px; border-radius:4px; overflow:hidden; border:1px solid rgba(0,230,180,.15); align-self:center; }
-    .veille-card .icon img { width:100%; height:100%; object-fit:cover; filter:brightness(.9) saturate(.8); transition:filter .3s; }
-    .veille-card:hover .icon img { filter:brightness(1) saturate(1); }
-    .veille-card h3, .veille-card p, .veille-card a { grid-column:2; }
-    .veille-card h3 { font-family:var(--head); font-weight:700; font-size:.95rem; color:#fff; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
-    .veille-card p { font-size:.8rem; color:var(--muted); margin-bottom:4px; line-height:1.6; }
-    .veille-card a { font-family:var(--mono); font-size:.7rem; color:var(--green); text-decoration:none; letter-spacing:.06em; margin-right:10px; }
-    .veille-card a:hover { color:var(--green2); }
+    .veille-link-card:hover { border-color:rgba(0,230,180,.4); box-shadow:0 12px 48px rgba(0,230,180,.08); }
+    .veille-card-content { position:relative; }
+    .veille-card-badge {
+      display:inline-block; font-family:var(--mono); font-size:.68rem; letter-spacing:.2em;
+      color:var(--green); background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.25);
+      padding:4px 12px; border-radius:2px; margin-bottom:18px;
+    }
+    .veille-card-title {
+      font-family:var(--head); font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700;
+      color:#fff; text-transform:uppercase; letter-spacing:.05em; line-height:1.1; margin-bottom:14px;
+    }
+    .veille-card-title span { color:var(--green); }
+    .veille-card-desc { font-size:.92rem; color:var(--text); line-height:1.8; margin-bottom:20px; max-width:540px; }
+    .veille-card-tags { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+    .veille-tag {
+      font-family:var(--mono); font-size:.66rem; letter-spacing:.12em; color:var(--muted);
+      border:1px solid var(--border); padding:3px 10px; border-radius:2px;
+    }
+    .btn-veille {
+      display:inline-flex; align-items:center; gap:10px;
+      font-family:var(--mono); font-size:.78rem; letter-spacing:.15em; text-transform:uppercase;
+      color:var(--green); background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35);
+      padding:12px 24px; border-radius:4px; text-decoration:none;
+      transition:background .25s, box-shadow .25s, gap .2s;
+    }
+    .btn-veille:hover { background:rgba(0,230,180,.18); box-shadow:0 0 24px rgba(0,230,180,.15); color:var(--green2); gap:14px; }
+    .veille-card-visual {
+      position:relative; width:180px; flex-shrink:0;
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .veille-stat {
+      background:rgba(8,18,38,.9); border:1px solid var(--border); border-radius:5px;
+      padding:12px 16px; text-align:center;
+    }
+    .veille-stat .num { font-family:var(--mono); font-size:1.4rem; color:var(--green); text-shadow:0 0 16px rgba(0,230,180,.4); line-height:1; }
+    .veille-stat .lbl { font-family:var(--mono); font-size:.62rem; color:var(--muted); letter-spacing:.08em; margin-top:4px; }
+    @media(max-width:768px) {
+      .veille-link-card { grid-template-columns:1fr; }
+      .veille-card-visual { display:none; }
+    }
 
     /* ── ENTREPRISE ── */
     .certs-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
@@ -282,6 +350,17 @@
     <div class="hero-line"></div>
   </div>
 
+  <!-- TABLEAU E5 -->
+  <a href="proe/E5_Tableau_de_synthese.pdf" target="_blank" class="tableau-banner reveal">
+    <div class="tableau-icon"><i class="fas fa-table"></i></div>
+    <div class="tableau-body">
+      <div class="tableau-eyebrow">// Épreuve E5 — BTS SIO SISR</div>
+      <div class="tableau-title">Tableau de Synthèse des Compétences</div>
+      <div class="tableau-desc">Récapitulatif de l'ensemble des compétences et situations professionnelles développées au cours de la formation et de l'alternance.</div>
+    </div>
+    <span class="tableau-cta">Consulter le tableau <i class="fas fa-arrow-right"></i></span>
+  </a>
+
   <!-- ABOUT -->
   <section id="about" class="content-section reveal">
     <div class="section-label">01 — À propos</div>
@@ -365,75 +444,41 @@
     </div>
   </section>
 
-  <!-- VEILLE HARDWARE -->
+  <!-- VEILLE -->
   <section id="veille-hardware" class="content-section reveal">
     <div class="section-label">04 — Veille technologique</div>
-    <h2 class="section-title">Veille Hardware</h2>
-    <div class="veille-intro">
-      <p>La veille technologique sur le matériel informatique est essentielle pour suivre l'évolution des composants qui constituent un ordinateur ou un serveur. Elle permet d'anticiper les besoins futurs, d'optimiser les performances et de faire des choix éclairés pour la conception ou l'amélioration d'un système.</p>
-      <p>Chaque composant joue un rôle crucial :</p>
-      <ul>
-        <li>CPU (Processeur) : cœur du système, il détermine la vitesse de traitement des tâches et l'efficacité générale de l'ordinateur.</li>
-        <li>GPU (Carte graphique) : responsable du rendu visuel et de la puissance pour les applications graphiques, le gaming ou le calcul scientifique.</li>
-        <li>RAM (Mémoire vive) : influence directement la fluidité et la capacité multitâche. La veille inclut les vitesses, capacités et compatibilité (DDR4, DDR5…).</li>
-        <li>Systèmes de refroidissement : ventirads ou watercooling maintiennent les composants à une température optimale.</li>
-        <li>Carte mère : elle relie tous les composants et définit les possibilités d'extension et de compatibilité.</li>
-        <li>Disques durs et SSD : le stockage affecte la vitesse d'accès aux données (NVMe, SATA, RAID).</li>
-        <li>Alimentation : fournit l'énergie nécessaire à l'ensemble des composants de façon stable et fiable.</li>
-      </ul>
-    </div>
-    <div class="veille-grid">
-      <div class="veille-card">
-        <div class="icon"><img src="https://media.cdnws.com/_i/3602/1455/2029/59/a-quoi-sert-un-processeur.jpeg" alt="CPU"/></div>
-        <h3>CPU</h3><p>Suivi des dernières générations de processeurs, performances et architectures.</p>
-        <a href="https://dropreference.com/fr/blog/guide/meilleur-processeur-gaming">En savoir plus</a><a href="https://www.cpu-monkey.com/fr/"> / Comparer</a>
+    <h2 class="section-title">Veille Technologique</h2>
+    <a href="veille_cybersecurite_bts_sio.html" target="_blank" class="veille-link-card">
+      <div class="veille-card-content">
+        <div class="veille-card-badge">// VEILLE — BTS SIO SISR</div>
+        <div class="veille-card-title"><span>Cybersécurité</span><br>Se protéger &amp; Protéger</div>
+        <p class="veille-card-desc">
+          Panorama complet des cybermenaces actuelles, bonnes pratiques de sécurité, boîte à outils professionnelle et stratégies de sensibilisation des utilisateurs — dans le contexte du technicien SISR.
+        </p>
+        <div class="veille-card-tags">
+          <span class="veille-tag">MENACES</span>
+          <span class="veille-tag">BONNES PRATIQUES</span>
+          <span class="veille-tag">OUTILS</span>
+          <span class="veille-tag">SENSIBILISATION</span>
+          <span class="veille-tag">RGPD · NIS2</span>
+        </div>
+        <span class="btn-veille">Accéder à la veille <i class="fas fa-arrow-right"></i></span>
       </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://m.media-amazon.com/images/I/61u+ioPoR1L._AC_SL1080_.jpg" alt="RAM"/></div>
-        <h3>RAM</h3><p>Suivi des nouvelles mémoires, vitesses, latences et types (DDR4/DDR5).</p>
-        <a href="https://dropreference.com/fr/blog/guide/ddr4-vs-ddr5">En savoir plus</a>
+      <div class="veille-card-visual">
+        <div class="veille-stat">
+          <div class="num">+38%</div>
+          <div class="lbl">Cyberattaques 2024</div>
+        </div>
+        <div class="veille-stat">
+          <div class="num">95%</div>
+          <div class="lbl">Erreur humaine</div>
+        </div>
+        <div class="veille-stat">
+          <div class="num">3,5M</div>
+          <div class="lbl">Postes non pourvus</div>
+        </div>
       </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://static.digitecgalaxus.ch/im/Files/7/6/6/0/5/1/4/3/radeon-teaser21.png?impolicy=teaser&resizeWidth=700&resizeHeight=350" alt="GPU"/></div>
-        <h3>GPU</h3><p>Suivi des cartes graphiques, performances pour gaming, IA et calcul scientifique.</p>
-        <a href="https://dropreference.com/fr/blog/guide/meilleure-carte-graphique">En savoir plus</a>
-      </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWIc_br2YQrQeNsjtFx9DKGjHmCj6NPNVCEg&s" alt="Stockage"/></div>
-        <h3>Stockage</h3><p>Veille sur SSD NVMe, SATA et HDD, vitesses et technologies RAID.</p>
-        <a href="https://dropreference.com/fr/blog/guide/types-ssd">En savoir plus</a>
-      </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://storage-asset.msi.com/global/picture/image/feature/power/MPG/A1000G-product/kv-xs.jpg" alt="PSU"/></div>
-        <h3>PSU</h3><p>Suivi de l'efficacité énergétique, certifications 80 PLUS et stabilité des alimentations.</p>
-        <a href="https://dropreference.com/fr/blog/guide/choix-alimentation-pc">En savoir plus</a>
-      </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://spacecomputer.fr/wp-content/uploads/2025/10/c6b32834-7b4d-4212-85a8-fb7caa21827e.png" alt="Refroidissement"/></div>
-        <h3>Refroidissement</h3><p>Suivi des ventirads, watercooling et solutions hybrides pour des températures optimales.</p>
-        <a href="https://dropreference.com/fr/blog/guide/comparatif-aio">AIO</a><a href="https://dropreference.com/fr/blog/guide/refroidissement-ventirad"> Ventirad</a>
-      </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://www.grosbill.com/images_produits/1be90428-73eb-4eac-9afc-a1f0e5cb057a.jpg" alt="Carte mère"/></div>
-        <h3>Carte mère</h3><p>Suivi des nouvelles cartes mères, compatibilité CPU/RAM, nombre de ports et possibilités d'extension.</p>
-        <a href="https://dropreference.com/fr/blog/guide/meilleure-carte-m%C3%A8re-gaming">En savoir plus</a>
-      </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://www.gravastar.com/cdn/shop/files/gravastar-v60-pro-8khz-magnetic-switch-gaming-keyboard-15.webp?v=1765965816&width=2048" alt="Clavier"/></div>
-        <h3>Clavier</h3><p>Suivi sur l'ergonomie, types de switches mécaniques/magnétiques et fonctionnalités programmables.</p>
-        <a href="https://dropreference.com/fr/blog/guide/meilleur-clavier-gamer">En savoir plus</a>
-      </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://www.pulsar.gg/cdn/shop/files/Bruce_Lee_85th_Anniversary_X2_CL_Galleryimage_005.jpg?v=1762327039" alt="Souris"/></div>
-        <h3>Souris</h3><p>Suivi de l'ergonomie, des capteurs haute précision et des innovations pour gaming et bureautique.</p>
-        <a href="https://dropreference.com/fr/blog/guide/souris-gamer-sans-fil">En savoir plus</a>
-      </div>
-      <div class="veille-card">
-        <div class="icon"><img src="https://www.cybertek.fr/images_produits/2093f0b0-6863-4834-9bc9-a8534a12f447.jpg" alt="Ecran"/></div>
-        <h3>Ecran</h3><p>Suivi des résolutions, fréquences, technologies des dalles et fonctionnalités pour le confort visuel.</p>
-        <a href="https://dropreference.com/fr/blog/guide/ecran-gaming">En savoir plus</a>
-      </div>
-    </div>
+    </a>
   </section>
 
   <!-- ENTREPRISE -->
