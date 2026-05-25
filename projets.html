@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accueil | Victor Trioux</title>
+  <link rel="stylesheet" href="style_accueil.css">
+  <link rel="stylesheet" href="fontawesome/css/all.min.css">
+</head>
+<body>
+
+  <!-- Vidéo en arrière-plan -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="video/852421-hd_1920_1080_30fps.mp4" type="video/mp4">
+    Votre navigateur ne supporte pas la vidéo HTML5.
+  </video>
+  
+  <header class="top-bar">
+    <div class="bar-inner">
+      <div class="logo">Victor Trioux</div>
+      <nav>
+        <ul class="nav-right">
+          <li><a href="page_accueil.html"><i class="fas fa-tasks fa-beat-fade"></i> Projet 1</a></li>
+          <li><a href="#"><i class="fas fa-tasks fa-beat-fade"></i> Projet 2</a></li>
+          <li><a href="#"><i class="fas fa-tasks fa-beat-fade"></i> Projet 3</a></li>
+          <li><a href="#"><i class="fas fa-tasks fa-beat-fade"></i> Projet 4</a></li>
+          <li><a href="#"><i class="fas fa-tasks fa-beat-fade"></i> Projet 5</a></li>
+          <li><a href="#"><i class="fas fa-tasks fa-beat-fade"></i> Projet 6</a></li>
+        </ul>
+      </nav>
+	</div>
+   </header>
+
+  <div class="main-content">
+    <section class="tabs-container">
+  <h2>Mes Projets</h2>
+
+  <div class="tabs" role="tablist" aria-label="Liste des projets">
+    <button class="tab-button active" data-tab="proj1" role="tab" aria-selected="true" aria-controls="proj1" id="tab-proj1">Projet 1</button>
+    <button class="tab-button" data-tab="proj2" role="tab" aria-selected="false" aria-controls="proj2" id="tab-proj2">Projet 2</button>
+    <button class="tab-button" data-tab="proj3" role="tab" aria-selected="false" aria-controls="proj3" id="tab-proj3">Projet 3</button>
+  </div>
+
+  <div class="tab-content active" id="proj1" role="tabpanel" aria-labelledby="tab-proj1">
+    <h3>Projet 1 - Active Directory</h3>
+    <p>Description courte de ton projet 1 ici.</p>
+    <img src="images/projet1.jpg" alt="Projet 1" />
+    <br />
+    <a href="docs/projet1.pdf" download>Télécharger la documentation</a>
+  </div>
+
+  <div class="tab-content" id="proj2" role="tabpanel" aria-labelledby="tab-proj2" tabindex="0" hidden>
+    <h3>Projet 2 - Exemple</h3>
+    <p>Description du projet 2.</p>
+    <img src="images/projet2.jpg" alt="Projet 2" />
+    <br />
+    <a href="docs/projet2.pdf" download>Télécharger la documentation</a>
+  </div>
+
+  <div class="tab-content" id="proj3" role="tabpanel" aria-labelledby="tab-proj3" tabindex="0" hidden>
+    <h3>Projet 3 - Exemple</h3>
+    <p>Description du projet 3.</p>
+    <img src="images/projet3.jpg" alt="Projet 3" />
+    <br />
+    <a href="docs/projet3.pdf" download>Télécharger la documentation</a>
+  </div>
+</section>
+
+<script>
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Désactiver tous les onglets
+      tabButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+        content.setAttribute('hidden', '');
+      });
+
+      // Activer onglet + contenu
+      button.classList.add('active');
+      button.setAttribute('aria-selected', 'true');
+
+      const tabId = button.getAttribute('data-tab');
+      const content = document.getElementById(tabId);
+      content.classList.add('active');
+      content.removeAttribute('hidden');
+    });
+  });
+</script>
+
+
+  </div>
+  
+  <footer class="footer-large">
+	
+	<section id="contact">
+  <h2><i class="fas fa-envelope icon"></i> Me Contacter</h2>
+  <form class="contact-form" action="https://formsubmit.io/send/victor.trioux@gmail.com" method="POST">
+      
+	  <!-- Anti-spam invisible -->
+      <input type="text" name="_honey" style="display:none">
+
+      <!-- Redirection après envoi -->
+      <input type="hidden" name="_redirect" value="merci.html">
+
+      <label for="name">Nom :</label>
+      <input type="text" id="name" name="Nom" required>
+
+      <label for="email">Email :</label>
+      <input type="email" id="email" name="Email" required>
+
+      <label for="message">Message :</label>
+      <textarea id="message" name="Message" rows="5" required></textarea>
+
+      <button type="submit">Envoyer</button>
+    </form>
+</section>
+
+  <div class="footer-container">
+    <div class="footer-col">
+      <h3>À propos</h3>
+      <p>Étudiant en BTS SIO SISR chez Ensitech, alternant chez Tersedia. Passionné par l'administration réseau et la cybersécurité.</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Contact</h3>
+      <p>Email Pro: victor.trioux@ensitech.eu</p>
+      <p>Email : victor.trioux@gmail.com</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Réseaux</h3>
+        <a href="https://www.linkedin.com/in/ton-profil" target="_blank">	  
+      <p><i class="fab fa-linkedin"></i> LinkedIn</p>
+	    <a href="https://github.com/ton-pseudo" target="_blank">
+      <p><i class="fab fa-github"></i> GitHub</p>
+    </div>
+  </div>
+  <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
+</footer>
+</body>
+</html>

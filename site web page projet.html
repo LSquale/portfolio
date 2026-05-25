@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Projets</title>
+    <style>
+        /* Global Styles */
+        * {
+		body {
+            background-image: url('https://img.freepik.com/vecteurs-libre/triangles-geometriques-vecteur-ressources-conception-fond-gris_53876-136684.jpg?t=st=1737907909~exp=1737911509~hmac=6f588fb32d51b239ea1a98d832ffae846bddea3510ed94f60d0fca23f63e3540&w=826'); /* Chemin vers ton image */
+            background-size: cover; /* Ajuste l'image pour couvrir tout l'écran */
+            background-position: center; /* Centre l'image dans la fenêtre */
+            background-repeat: no-repeat; /* Empêche la répétition de l'image */
+            .project-card img 
+            width: 100%;
+            height: 950px;
+            border-radius: 8px;
+            object-fit: cover; /* Garder les proportions de l'image */
+        }
+
+        
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+       
+
+        header h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 18px;
+        }
+
+        .projects {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .project-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: 10px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .project-card h2 {
+            font-size: 24px;
+            color:  #5d6d7e;
+            margin-bottom: 10px;
+        }
+
+        .project-card p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .project-card a {
+            text-decoration: none;
+            color: #fff;
+            background-color:  #5d6d7e;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .project-card a:hover {
+            background-color:  #5d6d7e;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Découvrez mes projets réaliser en entreprise:</h1>
+    </header>
+    
+    <section class="projects">
+        <div class="project-card">
+            <h2>VLAN</h2>
+            <p>configuration vlan .</p>
+            <a href="smb4986-vlan-configuration-via-cli-on-300-500-series-managed-switche.pdf">Voir le projet</a>
+        </div>
+        
+        <div class="project-card">
+            <h2>ACTIVE DIRECTORY</h2>
+            <p>utilisation de la console active directory</p>
+            <a href="Ad_intro.pdf">Voir le projet</a>
+        </div>
+
+        <div class="project-card">
+            <h2>GPO</h2>
+            <p>déploiment de gpo.</p>
+            <a href="GPO.pdf">Voir le projet</a>
+        </div>
+    </section>
+	<header>
+        <h1>Découvrez mes projets réaliser en cours:</h1>
+    </header>
+	
+	<section class="projects">
+        <div class="project-card">
+            <h2> VM WINDOWS.<h2>
+            <p>configuration machine virtuel sous windows.</p>
+			<a href="Machine-Virtuelle-et-Windows-10.pdf">Voir le projet</a>
+        </div>
+        
+        <div class="project-card">
+            <h2>APACHE2</h2>
+            <p>Procédure d'installation de Apache2.</p>
+            <a href="APACHE2-SSL.pdf" target="_blank">Voir le projet</a>
+        </div>
+
+        <div class="project-card">
+            <h2>OCS GLPI</h2>
+            <p>configuration de OCS inventory et GLPI.</p>
+            <a href="Tuto_OCS-GLPI.pdf">Voir le projet</a>
+        </div>
+    </section>
+
+    
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accueil | Victor Trioux</title>
+  <link rel="stylesheet" href="style_accueil.css">
+  <link rel="stylesheet" href="fontawesome/css/all.min.css">
+  <script src="souris.js" defer></script>
+</head>
+<body>
+
+  <!-- Vidéo en arrière-plan -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="video/server.mp4" type="video/mp4">
+    Votre navigateur ne supporte pas la vidéo HTML5.
+  </video>
+  
+  <header class="top-bar">
+    <div class="bar-inner">
+      <div class="logo glow-animated">Victor Trioux</div>
+      <nav>
+        <ul class="nav-right">
+          <li class="nav-glow">
+		  <a href="page_accueil.html"><i class="fa-solid fa-house fa-beat-fade"></i> Accueil</a>
+		  </li>
+        </ul>
+      </nav>
+	</div>
+   </header>
+
+  <div class="main-content">
+    <p class="logo glow-animated"> &nbsp;&nbsp;&nbsp;&nbsp;Bienvenue sur mon portfolio</p>
+    <a href="index.html" class="button">Portfolio</a>
+  </div>
+  
+  <footer class="footer-large">
+	
+	<section id="contact">
+  <h2><i class="fas fa-envelope icon"></i> Me Contacter</h2>
+  <form class="contact-form" action="https://formsubmit.io/send/victor.trioux@gmail.com" method="POST">
+      
+	  <!-- Anti-spam invisible -->
+      <input type="text" name="_honey" style="display:none">
+
+      <!-- Redirection après envoi -->
+      <input type="hidden" name="_redirect" value="merci.html">
+
+      <label for="name">Nom :</label>
+      <input type="text" id="name" name="Nom" required>
+
+      <label for="email">Email :</label>
+      <input type="email" id="email" name="Email" required>
+
+      <label for="message">Message :</label>
+      <textarea id="message" name="Message" rows="5" required></textarea>
+
+      <button type="submit">Envoyer</button>
+    </form>
+</section>
+
+  <div class="footer-container">
+    <div class="footer-col">
+      <h3>À propos</h3>
+      <p>Étudiant en BTS SIO SISR chez Ensitech, alternant chez Tersedia. Passionné par l'administration réseau et la cybersécurité.</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Contact</h3>
+      <p>Email Pro: victor.trioux@ensitech.eu</p>
+      <p>Email : victor.trioux@gmail.com</p>
+    </div>
+
+    <div class="footer-col">
+      <h3>Réseaux</h3>
+        <a href="https://www.linkedin.com/in/ton-profil" target="_blank">	  
+      <p><i class="fab fa-linkedin"></i> LinkedIn</p>
+	    <a href="https://github.com/ton-pseudo" target="_blank">
+      <p><i class="fab fa-github"></i> GitHub</p>
+    </div>
+  </div>
+  <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
+</footer>
+</body>
+</html>
