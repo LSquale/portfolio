@@ -196,6 +196,7 @@
       background:radial-gradient(ellipse at 0% 50%, rgba(0,230,180,.05) 0%, transparent 60%);
       pointer-events:none;
     }
+    .veille-link-card { cursor:pointer; }
     .veille-link-card:hover { border-color:rgba(0,230,180,.4); box-shadow:0 12px 48px rgba(0,230,180,.08); }
     .veille-card-content { position:relative; }
     .veille-card-badge {
@@ -429,16 +430,16 @@
       <a href="tets.html" target="_blank">Voir tous les projets →</a>
     </p>
     <div class="project-gallery">
-      <a href="Installer GLPI sur ubuntu.pdf" target="_blank">
+      <a href="proe/Installer GLPI sur ubuntu.pdf" target="_blank">
         <img src="https://www.bujarra.com/wp-content/uploads/2021/09/GLPI-Instalar-00.png?v=1630864335" alt="GLPI">
       </a>
-      <a href="Installation win-srv-ad-dns.pdf" target="_blank">
+      <a href="proe/Installation win-srv-ad-dns.pdf" target="_blank">
         <img src="https://adeo-informatique.fr/wp-content/uploads/2020/01/windows-server-2019-adeo-informatique.png" alt="Windows Server">
       </a>
-      <a href="Procédure de création VPN SSL forti.pdf" target="_blank">
+      <a href="prot/Procédure de création VPN SSL forti.pdf" target="_blank">
         <img src="https://s3.amazonaws.com/www-itopvpn-com/blog/20230731/1690783438456952.jpeg" alt="VPN">
       </a>
-      <a href="Pour commencer l'installation de TrueNAS SCALE.pdf" target="_blank">
+      <a href="prot/Pour commencer l'installation de TrueNAS SCALE.pdf" target="_blank">
         <img src="https://linuxiac.com/wp-content/uploads/2024/06/truenas-scale-docker.jpg" alt="TrueNAS">
       </a>
     </div>
@@ -448,7 +449,7 @@
   <section id="veille-hardware" class="content-section reveal">
     <div class="section-label">04 — Veille technologique</div>
     <h2 class="section-title">Veille Technologique</h2>
-    <a href="veille_cybersecurite_bts_sio.html" target="_blank" class="veille-link-card">
+    <div class="veille-link-card" onclick="window.open('veille_cybersecurite_bts_sio.html','_blank')">
       <div class="veille-card-content">
         <div class="veille-card-badge">// VEILLE — BTS SIO SISR</div>
         <div class="veille-card-title"><span>Cybersécurité</span><br>Se protéger &amp; Protéger</div>
@@ -462,7 +463,9 @@
           <span class="veille-tag">SENSIBILISATION</span>
           <span class="veille-tag">RGPD · NIS2</span>
         </div>
-        <span class="btn-veille">Accéder à la veille <i class="fas fa-arrow-right"></i></span>
+        <a href="veille_cybersecurite_bts_sio.html" target="_blank" class="btn-veille" onclick="event.stopPropagation()">
+          Accéder à la veille <i class="fas fa-arrow-right"></i>
+        </a>
       </div>
       <div class="veille-card-visual">
         <div class="veille-stat">
@@ -478,7 +481,7 @@
           <div class="lbl">Postes non pourvus</div>
         </div>
       </div>
-    </a>
+    </div>
   </section>
 
   <!-- ENTREPRISE -->
