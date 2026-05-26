@@ -9,311 +9,658 @@
   <link rel="icon" href="image/icons8-portfolio-64.png" type="image/png">
   <style>
     :root {
-      --bg:     #050a12;
-      --panel:  rgba(10,25,50,0.75);
-      --border: rgba(0,230,180,0.18);
-      --green:  #00e6b4;
-      --green2: #00ffcc;
-      --blue:   #00aaff;
-      --text:   #c8ddf0;
-      --muted:  #5d7a99;
-      --mono:   'Share Tech Mono', monospace;
-      --head:   'Rajdhani', sans-serif;
-      --body:   'Exo 2', sans-serif;
+      --bg:       #050a12;
+      --panel:    rgba(10,25,50,0.75);
+      --border:   rgba(0,230,180,0.18);
+      --green:    #00e6b4;
+      --green2:   #00ffcc;
+      --blue:     #00aaff;
+      --text:     #c8ddf0;
+      --muted:    #5d7a99;
+      --mono:     'Share Tech Mono', monospace;
+      --head:     'Rajdhani', sans-serif;
+      --body:     'Exo 2', sans-serif;
+      --sidebar-w: 230px;
+      --sidebar-c: 56px;
+      --red:    #ff3d6b;
+      --yellow: #ffd166;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); font-family: var(--body); line-height: 1.7; overflow-x: hidden; }
+    html, body { height: 100%; overflow: hidden; }
+    body { background: var(--bg); color: var(--text); font-family: var(--body); line-height: 1.7; }
 
+    /* ── BACKGROUND ── */
     #matrix-canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; opacity:.07; pointer-events:none; }
-
     body::before {
       content:''; position:fixed; inset:0;
-      background-image: linear-gradient(rgba(0,230,180,.03) 1px,transparent 1px), linear-gradient(90deg,rgba(0,230,180,.03) 1px,transparent 1px);
+      background-image: linear-gradient(rgba(0,230,180,.03) 1px,transparent 1px),
+                        linear-gradient(90deg,rgba(0,230,180,.03) 1px,transparent 1px);
       background-size: 40px 40px; z-index:0; pointer-events:none;
     }
 
-    /* ── STICKY NAV ── */
-    .sticky-nav {
-      position: sticky; top:0; z-index:100;
-      background: rgba(5,10,18,.92); backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      height: 100vh;
+      position: fixed;
+      top: 0; left: 0;
+      background: rgba(5,10,18,.97);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.28s cubic-bezier(.4,0,.2,1);
+      overflow: hidden;
     }
-    .nav-inner {
-      max-width:1100px; margin:0 auto; padding:0 24px;
-      display:flex; align-items:center; justify-content:space-between; height:52px;
+    .sidebar.collapsed { width: var(--sidebar-c); }
+    .sidebar.collapsed .sidebar-brand-sub,
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .nav-num,
+    .sidebar.collapsed .sidebar-copy { display: none; }
+    .sidebar.collapsed .sidebar-brand { padding: 22px 0; display: flex; justify-content: center; }
+    .sidebar.collapsed .sidebar-brand-name { font-size: .65rem; letter-spacing: .04em; }
+    .sidebar.collapsed .sidebar-nav-item { justify-content: center; padding: 14px 0; border-left: 3px solid transparent; }
+    .sidebar.collapsed .sidebar-nav-item.active { background: rgba(0,230,180,.1); border-left-color: var(--green); }
+    .sidebar.collapsed .sidebar-nav-item i { width: auto; font-size: .9rem; }
+    .sidebar.collapsed .sidebar-footer { padding: 12px 0; align-items: center; }
+    .sidebar.collapsed .sidebar-socials { flex-direction: column; align-items: center; gap: 6px; }
+    .sidebar-collapser {
+      width: 100%; padding: 10px 0; flex-shrink: 0;
+      background: none; border: none; border-top: 1px solid var(--border);
+      color: var(--muted); cursor: pointer; font-size: .75rem;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: var(--mono); letter-spacing: .1em; text-transform: uppercase;
+      transition: color .2s, background .2s;
     }
-    .nav-brand { font-family:var(--mono); font-size:.75rem; color:var(--green); letter-spacing:.15em; text-decoration:none; }
-    .nav-links { display:flex; gap:4px; list-style:none; }
-    .nav-links a {
-      font-family:var(--mono); font-size:.68rem; letter-spacing:.12em;
-      color:var(--muted); text-decoration:none; padding:5px 12px;
-      border-radius:3px; transition:color .2s, background .2s; text-transform:uppercase;
-    }
-    .nav-links a:hover, .nav-links a.active { color:var(--green); background:rgba(0,230,180,.08); }
+    .sidebar-collapser:hover { color: var(--green); background: rgba(0,230,180,.05); }
+    .sidebar-collapser .collapser-label { font-size: .6rem; transition: opacity .2s; }
+    .sidebar.collapsed .sidebar-collapser .collapser-label { display: none; }
 
-    /* ── WRAPPER ── */
-    .wrapper { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 24px 80px; }
+    .sidebar-brand {
+      padding: 28px 24px 22px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .sidebar-brand-name {
+      font-family: var(--mono);
+      font-size: .88rem;
+      color: var(--green);
+      letter-spacing: .18em;
+      display: block;
+      text-shadow: 0 0 20px rgba(0,230,180,.35);
+    }
+    .sidebar-brand-sub {
+      font-family: var(--mono);
+      font-size: .6rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      margin-top: 5px;
+      display: block;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+      list-style: none;
+      overflow-y: auto;
+    }
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      font-family: var(--mono);
+      font-size: .7rem;
+      letter-spacing: .14em;
+      color: var(--muted);
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .2s, background .2s, border-color .2s;
+      border-left: 3px solid transparent;
+      user-select: none;
+      position: relative;
+    }
+    .sidebar-nav-item i {
+      width: 16px;
+      text-align: center;
+      font-size: .8rem;
+      flex-shrink: 0;
+    }
+    .sidebar-nav-item .nav-num {
+      font-size: .58rem;
+      opacity: .5;
+      margin-left: auto;
+      letter-spacing: .05em;
+    }
+    .sidebar-nav-item:hover {
+      color: var(--text);
+      background: rgba(0,230,180,.05);
+      border-left-color: rgba(0,230,180,.3);
+    }
+    .sidebar-nav-item.active {
+      color: var(--green);
+      background: rgba(0,230,180,.08);
+      border-left-color: var(--green);
+    }
+    .sidebar-nav-item.active .nav-num { color: var(--green); opacity: .7; }
+
+    .sidebar-footer {
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .sidebar-socials { display: flex; gap: 8px; margin-bottom: 12px; }
+    .sidebar-social-link {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); border-radius: 4px;
+      color: var(--muted); font-size: .85rem;
+      text-decoration: none; transition: color .2s, border-color .2s, background .2s;
+    }
+    .sidebar-social-link:hover { color: var(--green); border-color: rgba(0,230,180,.4); background: rgba(0,230,180,.06); }
+    .sidebar-copy { font-family: var(--mono); font-size: .58rem; color: var(--muted); letter-spacing: .08em; }
+
+    /* ── MOBILE TOPBAR ── */
+    .mobile-topbar {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      background: rgba(5,10,18,.97);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      z-index: 300;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .mobile-brand { font-family: var(--mono); font-size: .82rem; color: var(--green); letter-spacing: .18em; }
+    .sidebar-toggle {
+      background: none; border: 1px solid var(--border); border-radius: 4px;
+      color: var(--muted); width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: .9rem;
+      transition: color .2s, border-color .2s;
+    }
+    .sidebar-toggle:hover { color: var(--green); border-color: rgba(0,230,180,.4); }
+
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.65); z-index: 190;
+    }
+    .sidebar-overlay.open { display: block; }
+
+    /* ── MAIN CONTENT ── */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 52px 56px 80px;
+      position: relative;
+      z-index: 1;
+      transition: margin-left 0.28s cubic-bezier(.4,0,.2,1);
+    }
+    .main-content.collapsed { margin-left: var(--sidebar-c); }
+
+    /* ── PAGES ── */
+    .page { display: none; max-width: 960px; margin: 0 auto; }
+    .page.active { display: block; animation: pageFadeIn .3s ease both; }
+
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 36px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .section-label {
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .25em; color: var(--green);
+      text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .section-title { font-family: var(--head); font-size: clamp(1.5rem,3vw,2.2rem); font-weight: 700; color: #fff; letter-spacing: .05em; text-transform: uppercase; }
+    .content-section { margin-bottom: 52px; }
 
     /* ── HERO ── */
-    .hero { padding:80px 0 60px; text-align:center; animation:fadeIn .8s ease both; }
+    .hero { padding: 56px 0 44px; text-align: center; }
     .hero-badge {
-      display:inline-block; font-family:var(--mono); font-size:.72rem; letter-spacing:.2em;
-      color:var(--green); background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.3);
-      padding:5px 16px; border-radius:2px; margin-bottom:28px;
+      display: inline-block; font-family: var(--mono); font-size: .72rem; letter-spacing: .2em;
+      color: var(--green); background: rgba(0,230,180,.08); border: 1px solid rgba(0,230,180,.3);
+      padding: 5px 16px; border-radius: 2px; margin-bottom: 28px;
     }
     .hero h1 {
-      font-family:var(--head); font-size:clamp(2.8rem,7vw,5rem); font-weight:700;
-      color:#fff; letter-spacing:.05em; text-transform:uppercase; line-height:1.05;
-      animation:slideUp .7s ease both .1s;
+      font-family: var(--head); font-size: clamp(2.8rem,6vw,5rem); font-weight: 700;
+      color: #fff; letter-spacing: .05em; text-transform: uppercase; line-height: 1.05;
     }
-    .hero h1 span { color:var(--green); text-shadow:0 0 30px rgba(0,230,180,.4); }
-    .hero-sub { font-family:var(--mono); font-size:.85rem; color:var(--muted); margin-top:16px; letter-spacing:.1em; animation:fadeIn .8s ease both .25s; }
-    .hero-meta { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:28px; animation:fadeIn 1s ease both .4s; }
+    .hero h1 span { color: var(--green); text-shadow: 0 0 30px rgba(0,230,180,.4); }
+    .hero-sub { font-family: var(--mono); font-size: .85rem; color: var(--muted); margin-top: 16px; letter-spacing: .1em; }
+    .hero-meta { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 28px; }
     .meta-chip {
-      display:flex; align-items:center; gap:7px; font-family:var(--mono); font-size:.72rem;
-      color:var(--muted); background:var(--panel); border:1px solid var(--border);
-      padding:6px 14px; border-radius:3px; backdrop-filter:blur(8px);
+      display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: .72rem;
+      color: var(--muted); background: var(--panel); border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 3px; backdrop-filter: blur(8px);
     }
-    .meta-chip .dot { width:5px; height:5px; background:var(--green); border-radius:50%; box-shadow:0 0 6px var(--green); animation:pulse 2s infinite; }
-    .hero-line { width:120px; height:2px; background:linear-gradient(90deg,transparent,var(--green),transparent); margin:36px auto 0; }
+    .meta-chip .dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+    .hero-line { width: 120px; height: 2px; background: linear-gradient(90deg,transparent,var(--green),transparent); margin: 36px auto 0; }
 
     /* ── TABLEAU E5 BANNER ── */
     .tableau-banner {
-      display:grid; grid-template-columns:auto 1fr auto; gap:24px; align-items:center;
-      background:var(--panel); border:1px solid rgba(0,230,180,.35);
-      border-left:4px solid var(--green); border-radius:8px;
-      padding:28px 32px; backdrop-filter:blur(12px);
-      margin-bottom:60px; position:relative; overflow:hidden;
-      text-decoration:none; transition:border-color .3s, box-shadow .3s, transform .3s;
+      display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;
+      background: var(--panel); border: 1px solid rgba(0,230,180,.35);
+      border-left: 4px solid var(--green); border-radius: 8px;
+      padding: 28px 32px; backdrop-filter: blur(12px);
+      margin-top: 40px; position: relative; overflow: hidden;
+      text-decoration: none; transition: border-color .3s, box-shadow .3s, transform .3s;
     }
     .tableau-banner::before {
       content:''; position:absolute; inset:0;
-      background:radial-gradient(ellipse at 0% 50%, rgba(0,230,180,.06) 0%, transparent 55%);
-      pointer-events:none;
+      background: radial-gradient(ellipse at 0% 50%, rgba(0,230,180,.06) 0%, transparent 55%);
+      pointer-events: none;
     }
-    .tableau-banner:hover { border-color:rgba(0,230,180,.6); box-shadow:0 8px 40px rgba(0,230,180,.12); transform:translateY(-2px); }
+    .tableau-banner:hover { border-color: rgba(0,230,180,.6); box-shadow: 0 8px 40px rgba(0,230,180,.12); transform: translateY(-2px); }
     .tableau-icon {
-      width:56px; height:56px; border-radius:6px; flex-shrink:0;
-      background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.3);
-      display:flex; align-items:center; justify-content:center;
-      font-size:1.5rem; color:var(--green); position:relative;
+      width: 56px; height: 56px; border-radius: 6px; flex-shrink: 0;
+      background: rgba(0,230,180,.1); border: 1px solid rgba(0,230,180,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: var(--green);
     }
-    .tableau-body { position:relative; }
-    .tableau-eyebrow { font-family:var(--mono); font-size:.65rem; letter-spacing:.22em; color:var(--green); text-transform:uppercase; margin-bottom:6px; }
-    .tableau-title { font-family:var(--head); font-size:1.25rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
-    .tableau-desc { font-size:.85rem; color:var(--muted); line-height:1.6; }
+    .tableau-body { position: relative; }
+    .tableau-eyebrow { font-family: var(--mono); font-size: .65rem; letter-spacing: .22em; color: var(--green); text-transform: uppercase; margin-bottom: 6px; }
+    .tableau-title { font-family: var(--head); font-size: 1.25rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .tableau-desc { font-size: .85rem; color: var(--muted); line-height: 1.6; }
     .tableau-cta {
-      display:inline-flex; align-items:center; gap:8px; flex-shrink:0; position:relative;
-      font-family:var(--mono); font-size:.72rem; letter-spacing:.15em; text-transform:uppercase;
-      color:var(--green); background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35);
-      padding:10px 20px; border-radius:4px; white-space:nowrap;
-      transition:background .25s, box-shadow .25s, gap .2s;
+      display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;
+      font-family: var(--mono); font-size: .72rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--green); background: rgba(0,230,180,.1); border: 1px solid rgba(0,230,180,.35);
+      padding: 10px 20px; border-radius: 4px; white-space: nowrap;
+      transition: background .25s, box-shadow .25s, gap .2s;
     }
-    .tableau-banner:hover .tableau-cta { background:rgba(0,230,180,.18); box-shadow:0 0 20px rgba(0,230,180,.15); gap:12px; }
-    @media(max-width:640px) {
-      .tableau-banner { grid-template-columns:1fr; }
-      .tableau-icon { display:none; }
-      .tableau-cta { justify-self:start; }
-    }
-
-    /* ── SECTION LABELS ── */
-    .section-label {
-      font-family:var(--mono); font-size:.7rem; letter-spacing:.25em; color:var(--green);
-      text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:10px;
-    }
-    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
-    .section-title { font-family:var(--head); font-size:clamp(1.5rem,3vw,2.2rem); font-weight:700; color:#fff; letter-spacing:.05em; text-transform:uppercase; margin-bottom:28px; }
-    .content-section { margin-bottom:70px; }
+    .tableau-banner:hover .tableau-cta { background: rgba(0,230,180,.18); box-shadow: 0 0 20px rgba(0,230,180,.15); gap: 12px; }
 
     /* ── ABOUT ── */
-    .about-layout { display:grid; grid-template-columns:1fr 280px; gap:20px; align-items:start; }
+    .about-layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; margin-top: 40px; }
     .about-text {
-      background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--green);
-      border-radius:6px; padding:32px 36px; backdrop-filter:blur(12px);
+      background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--green);
+      border-radius: 6px; padding: 32px 36px; backdrop-filter: blur(12px);
     }
-    .about-text p { font-size:.95rem; color:var(--text); line-height:1.85; }
-    .about-text p + p { margin-top:12px; }
-    .about-text a { color:var(--green); border-bottom:1px solid rgba(0,230,180,.25); }
-    .about-text a:hover { color:var(--green2); }
-    .about-sidebar { display:flex; flex-direction:column; gap:14px; }
+    .about-text p { font-size: .95rem; color: var(--text); line-height: 1.85; }
+    .about-text p + p { margin-top: 12px; }
+    .about-text a { color: var(--green); border-bottom: 1px solid rgba(0,230,180,.25); }
+    .about-text a:hover { color: var(--green2); }
+    .about-sidebar { display: flex; flex-direction: column; gap: 14px; }
     .cv-card {
-      background:var(--panel); border:1px solid rgba(0,230,180,.3); border-radius:6px;
-      padding:24px; text-align:center; backdrop-filter:blur(12px); transition:border-color .3s, box-shadow .3s;
+      background: var(--panel); border: 1px solid rgba(0,230,180,.3); border-radius: 6px;
+      padding: 24px; text-align: center; backdrop-filter: blur(12px);
+      transition: border-color .3s, box-shadow .3s;
     }
-    .cv-card:hover { border-color:rgba(0,230,180,.5); box-shadow:0 8px 32px rgba(0,230,180,.1); }
-    .cv-card-icon { font-size:2rem; color:var(--green); margin-bottom:10px; }
-    .cv-card h4 { font-family:var(--head); font-size:.9rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px; }
+    .cv-card:hover { border-color: rgba(0,230,180,.5); box-shadow: 0 8px 32px rgba(0,230,180,.1); }
+    .cv-card-icon { font-size: 2rem; color: var(--green); margin-bottom: 10px; }
+    .cv-card h4 { font-family: var(--head); font-size: .9rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
     .btn-cv {
-      display:inline-block; font-family:var(--mono); font-size:.72rem; letter-spacing:.15em;
-      color:var(--green); background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35);
-      padding:10px 20px; border-radius:4px; text-decoration:none; text-transform:uppercase;
-      transition:background .25s, box-shadow .25s;
+      display: inline-block; font-family: var(--mono); font-size: .72rem; letter-spacing: .15em;
+      color: var(--green); background: rgba(0,230,180,.1); border: 1px solid rgba(0,230,180,.35);
+      padding: 10px 20px; border-radius: 4px; text-decoration: none; text-transform: uppercase;
+      transition: background .25s, box-shadow .25s;
     }
-    .btn-cv:hover { background:rgba(0,230,180,.18); box-shadow:0 0 20px rgba(0,230,180,.15); color:var(--green2); }
-    .info-card { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:20px; backdrop-filter:blur(8px); }
-    .info-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(0,230,180,.08); }
-    .info-row:last-child { border-bottom:none; }
-    .info-row i { color:var(--green); width:16px; text-align:center; font-size:.85rem; }
-    .info-row span { color:var(--muted); font-family:var(--mono); font-size:.72rem; letter-spacing:.05em; }
+    .btn-cv:hover { background: rgba(0,230,180,.18); box-shadow: 0 0 20px rgba(0,230,180,.15); color: var(--green2); }
+    .info-card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px; backdrop-filter: blur(8px); }
+    .info-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,230,180,.08); }
+    .info-row:last-child { border-bottom: none; }
+    .info-row i { color: var(--green); width: 16px; text-align: center; font-size: .85rem; }
+    .info-row span { color: var(--muted); font-family: var(--mono); font-size: .72rem; letter-spacing: .05em; }
 
     /* ── BTS ── */
-    .bts-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .bts-block { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:24px; backdrop-filter:blur(10px); }
-    .bts-block.full { grid-column:1/-1; }
-    .bts-block h4 { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin-bottom:12px; }
-    .bts-block p { font-size:.9rem; color:var(--text); line-height:1.8; }
-    .career-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:20px; }
+    .bts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .bts-block { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 24px; backdrop-filter: blur(10px); }
+    .bts-block.full { grid-column: 1/-1; }
+    .bts-block h4 { font-family: var(--mono); font-size: .7rem; letter-spacing: .2em; color: var(--green); text-transform: uppercase; margin-bottom: 12px; }
+    .bts-block p { font-size: .9rem; color: var(--text); line-height: 1.8; }
+    .career-label { font-family: var(--mono); font-size: .7rem; letter-spacing: .2em; color: var(--green); text-transform: uppercase; margin: 32px 0 14px; }
+    .career-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 10px; }
     .career-link {
-      display:flex; align-items:center; gap:10px; background:rgba(8,18,38,.8);
-      border:1px solid var(--border); border-radius:5px; padding:12px 16px;
-      text-decoration:none; transition:border-color .25s, transform .25s, color .25s;
-      font-size:.85rem; color:var(--text);
+      display: flex; align-items: center; gap: 10px; background: rgba(8,18,38,.8);
+      border: 1px solid var(--border); border-radius: 5px; padding: 12px 16px;
+      text-decoration: none; transition: border-color .25s, transform .25s, color .25s;
+      font-size: .85rem; color: var(--text);
     }
-    .career-link::before { content:'▸'; color:var(--green); flex-shrink:0; }
-    .career-link:hover { border-color:rgba(0,230,180,.4); transform:translateX(4px); color:var(--green); }
-    .career-label { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin:28px 0 14px; }
+    .career-link::before { content: '▸'; color: var(--green); flex-shrink: 0; }
+    .career-link:hover { border-color: rgba(0,230,180,.4); transform: translateX(4px); color: var(--green); }
 
     /* ── PROJECTS ── */
-    .projects-intro { font-size:.92rem; color:var(--text); margin-bottom:20px; }
-    .projects-intro a { color:var(--green); border-bottom:1px solid rgba(0,230,180,.3); margin-left:8px; }
-    .project-gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; }
-    .project-gallery a { border:1px solid var(--border); border-radius:6px; overflow:hidden; display:block; transition:border-color .3s, transform .3s, box-shadow .3s; text-decoration:none; }
-    .project-gallery a:hover { border-color:rgba(0,230,180,.45); transform:translateY(-4px); box-shadow:0 10px 36px rgba(0,230,180,.1); }
-    .project-gallery img { width:100%; height:140px; object-fit:cover; display:block; filter:brightness(.8) saturate(.75); transition:filter .3s; }
-    .project-gallery a:hover img { filter:brightness(1) saturate(1); }
+    .projects-intro { font-size: .92rem; color: var(--text); margin-bottom: 20px; }
+    .projects-intro a { color: var(--green); border-bottom: 1px solid rgba(0,230,180,.3); margin-left: 8px; }
+    .project-gallery { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 16px; }
+    .project-gallery a { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; display: block; transition: border-color .3s, transform .3s, box-shadow .3s; text-decoration: none; }
+    .project-gallery a:hover { border-color: rgba(0,230,180,.45); transform: translateY(-4px); box-shadow: 0 10px 36px rgba(0,230,180,.1); }
+    .project-gallery img { width: 100%; height: 140px; object-fit: cover; display: block; filter: brightness(.8) saturate(.75); transition: filter .3s; }
+    .project-gallery a:hover img { filter: brightness(1) saturate(1); }
 
-    /* ── VEILLE LINK CARD ── */
+    /* ── VEILLE ── */
     .veille-link-card {
-      background:var(--panel); border:1px solid var(--border); border-radius:8px;
-      padding:48px 40px; backdrop-filter:blur(12px);
-      display:grid; grid-template-columns:1fr auto; gap:32px; align-items:center;
-      transition:border-color .3s, box-shadow .3s;
-      position:relative; overflow:hidden;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 48px 40px; backdrop-filter: blur(12px);
+      display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center;
+      transition: border-color .3s, box-shadow .3s;
+      position: relative; overflow: hidden; cursor: pointer;
     }
     .veille-link-card::before {
       content:''; position:absolute; inset:0;
-      background:radial-gradient(ellipse at 0% 50%, rgba(0,230,180,.05) 0%, transparent 60%);
-      pointer-events:none;
+      background: radial-gradient(ellipse at 0% 50%, rgba(0,230,180,.05) 0%, transparent 60%);
+      pointer-events: none;
     }
-    .veille-link-card { cursor:pointer; }
-    .veille-link-card:hover { border-color:rgba(0,230,180,.4); box-shadow:0 12px 48px rgba(0,230,180,.08); }
-    .veille-card-content { position:relative; }
+    .veille-link-card:hover { border-color: rgba(0,230,180,.4); box-shadow: 0 12px 48px rgba(0,230,180,.08); }
+    .veille-card-content { position: relative; }
     .veille-card-badge {
-      display:inline-block; font-family:var(--mono); font-size:.68rem; letter-spacing:.2em;
-      color:var(--green); background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.25);
-      padding:4px 12px; border-radius:2px; margin-bottom:18px;
+      display: inline-block; font-family: var(--mono); font-size: .68rem; letter-spacing: .2em;
+      color: var(--green); background: rgba(0,230,180,.08); border: 1px solid rgba(0,230,180,.25);
+      padding: 4px 12px; border-radius: 2px; margin-bottom: 18px;
     }
     .veille-card-title {
-      font-family:var(--head); font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700;
-      color:#fff; text-transform:uppercase; letter-spacing:.05em; line-height:1.1; margin-bottom:14px;
+      font-family: var(--head); font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 700;
+      color: #fff; text-transform: uppercase; letter-spacing: .05em; line-height: 1.1; margin-bottom: 14px;
     }
-    .veille-card-title span { color:var(--green); }
-    .veille-card-desc { font-size:.92rem; color:var(--text); line-height:1.8; margin-bottom:20px; max-width:540px; }
-    .veille-card-tags { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
-    .veille-tag {
-      font-family:var(--mono); font-size:.66rem; letter-spacing:.12em; color:var(--muted);
-      border:1px solid var(--border); padding:3px 10px; border-radius:2px;
-    }
+    .veille-card-title span { color: var(--green); }
+    .veille-card-desc { font-size: .92rem; color: var(--text); line-height: 1.8; margin-bottom: 20px; max-width: 540px; }
+    .veille-card-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .veille-tag { font-family: var(--mono); font-size: .66rem; letter-spacing: .12em; color: var(--muted); border: 1px solid var(--border); padding: 3px 10px; border-radius: 2px; }
     .btn-veille {
-      display:inline-flex; align-items:center; gap:10px;
-      font-family:var(--mono); font-size:.78rem; letter-spacing:.15em; text-transform:uppercase;
-      color:var(--green); background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35);
-      padding:12px 24px; border-radius:4px; text-decoration:none;
-      transition:background .25s, box-shadow .25s, gap .2s;
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: .78rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--green); background: rgba(0,230,180,.1); border: 1px solid rgba(0,230,180,.35);
+      padding: 12px 24px; border-radius: 4px; text-decoration: none;
+      transition: background .25s, box-shadow .25s, gap .2s;
     }
-    .btn-veille:hover { background:rgba(0,230,180,.18); box-shadow:0 0 24px rgba(0,230,180,.15); color:var(--green2); gap:14px; }
-    .veille-card-visual {
-      position:relative; width:180px; flex-shrink:0;
-      display:flex; flex-direction:column; gap:8px;
-    }
-    .veille-stat {
-      background:rgba(8,18,38,.9); border:1px solid var(--border); border-radius:5px;
-      padding:12px 16px; text-align:center;
-    }
-    .veille-stat .num { font-family:var(--mono); font-size:1.4rem; color:var(--green); text-shadow:0 0 16px rgba(0,230,180,.4); line-height:1; }
-    .veille-stat .lbl { font-family:var(--mono); font-size:.62rem; color:var(--muted); letter-spacing:.08em; margin-top:4px; }
-    @media(max-width:768px) {
-      .veille-link-card { grid-template-columns:1fr; }
-      .veille-card-visual { display:none; }
-    }
+    .btn-veille:hover { background: rgba(0,230,180,.18); box-shadow: 0 0 24px rgba(0,230,180,.15); color: var(--green2); gap: 14px; }
+    .veille-card-visual { position: relative; width: 180px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+    .veille-stat { background: rgba(8,18,38,.9); border: 1px solid var(--border); border-radius: 5px; padding: 12px 16px; text-align: center; }
+    .veille-stat .num { font-family: var(--mono); font-size: 1.4rem; color: var(--green); text-shadow: 0 0 16px rgba(0,230,180,.4); line-height: 1; }
+    .veille-stat .lbl { font-family: var(--mono); font-size: .62rem; color: var(--muted); letter-spacing: .08em; margin-top: 4px; }
 
     /* ── ENTREPRISE ── */
-    .certs-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
-    .cert-badge {
-      font-family:var(--mono); font-size:.68rem; letter-spacing:.12em; color:var(--green);
-      background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.25); padding:5px 12px; border-radius:3px;
-    }
-    .services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px; margin-bottom:24px; }
-    .service-card {
-      background:var(--panel); border:1px solid var(--border); border-radius:6px;
-      padding:20px 22px; backdrop-filter:blur(8px); transition:border-color .3s, transform .3s;
-    }
-    .service-card:hover { border-color:rgba(0,230,180,.35); transform:translateY(-2px); }
-    .service-card h4 { font-family:var(--head); font-weight:700; font-size:.95rem; color:#fff; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
-    .service-card h4 a { color:#fff; text-decoration:none; transition:color .2s; }
-    .service-card h4 a:hover { color:var(--green); }
-    .service-card p { font-size:.85rem; color:var(--muted); line-height:1.7; }
-    .entreprise-text {
-      background:var(--panel); border:1px solid var(--border); border-radius:6px;
-      padding:28px 32px; backdrop-filter:blur(10px); margin-bottom:24px;
-    }
-    .entreprise-text p { font-size:.92rem; color:var(--text); line-height:1.85; margin-bottom:14px; }
-    .entreprise-text p:last-child { margin-bottom:0; }
-    .entreprise-text a { color:var(--green); border-bottom:1px solid rgba(0,230,180,.25); }
-    .entreprise-text a:hover { color:var(--green2); }
-    .tickets-label { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin-bottom:14px; }
-    .ticket-gallery { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
-    .ticket-gallery a { border:1px solid var(--border); border-radius:6px; overflow:hidden; display:block; transition:border-color .3s, transform .3s, box-shadow .3s; text-decoration:none; }
-    .ticket-gallery a:hover { border-color:rgba(0,230,180,.45); transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,230,180,.1); }
-    .ticket-gallery img { width:100%; height:110px; object-fit:cover; display:block; filter:brightness(.8) saturate(.7); transition:filter .3s; }
-    .ticket-gallery a:hover img { filter:brightness(1) saturate(1); }
+    .certs-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .cert-badge { font-family: var(--mono); font-size: .68rem; letter-spacing: .12em; color: var(--green); background: rgba(0,230,180,.08); border: 1px solid rgba(0,230,180,.25); padding: 5px 12px; border-radius: 3px; }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 14px; margin-bottom: 24px; }
+    .service-card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px 22px; backdrop-filter: blur(8px); transition: border-color .3s, transform .3s; }
+    .service-card:hover { border-color: rgba(0,230,180,.35); transform: translateY(-2px); }
+    .service-card h4 { font-family: var(--head); font-weight: 700; font-size: .95rem; color: #fff; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+    .service-card h4 a { color: #fff; text-decoration: none; transition: color .2s; }
+    .service-card h4 a:hover { color: var(--green); }
+    .service-card p { font-size: .85rem; color: var(--muted); line-height: 1.7; }
+    .entreprise-text { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 28px 32px; backdrop-filter: blur(10px); margin-bottom: 24px; }
+    .entreprise-text p { font-size: .92rem; color: var(--text); line-height: 1.85; margin-bottom: 14px; }
+    .entreprise-text p:last-child { margin-bottom: 0; }
+    .entreprise-text a { color: var(--green); border-bottom: 1px solid rgba(0,230,180,.25); }
+    .entreprise-text a:hover { color: var(--green2); }
+    .tickets-label { font-family: var(--mono); font-size: .7rem; letter-spacing: .2em; color: var(--green); text-transform: uppercase; margin-bottom: 14px; }
+    .ticket-gallery { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 14px; }
+    .ticket-gallery a { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; display: block; transition: border-color .3s, transform .3s, box-shadow .3s; text-decoration: none; }
+    .ticket-gallery a:hover { border-color: rgba(0,230,180,.45); transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,230,180,.1); }
+    .ticket-gallery img { width: 100%; height: 110px; object-fit: cover; display: block; filter: brightness(.8) saturate(.7); transition: filter .3s; }
+    .ticket-gallery a:hover img { filter: brightness(1) saturate(1); }
 
-    /* ── CONTACT & FOOTER ── */
-    .footer-large { border-top:1px solid var(--border); padding-top:50px; margin-top:20px; }
-    #contact h2 { font-family:var(--head); font-size:1.4rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px; }
-    #contact h2 i { color:var(--green); margin-right:8px; }
-    .contact-form { display:flex; flex-direction:column; gap:12px; max-width:560px; margin-top:20px; }
-    .contact-form label { font-family:var(--mono); font-size:.7rem; color:var(--muted); letter-spacing:.15em; text-transform:uppercase; }
+    /* ── CONTACT ── */
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+    .contact-form { display: flex; flex-direction: column; gap: 12px; }
+    .contact-form label { font-family: var(--mono); font-size: .7rem; color: var(--muted); letter-spacing: .15em; text-transform: uppercase; }
     .contact-form input, .contact-form textarea {
-      background:rgba(5,10,18,.85); border:1px solid var(--border); border-radius:4px;
-      color:var(--text); font-family:var(--body); font-size:.9rem; padding:10px 14px;
-      outline:none; transition:border-color .25s, box-shadow .25s; resize:vertical; width:100%;
+      background: rgba(5,10,18,.85); border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text); font-family: var(--body); font-size: .9rem; padding: 10px 14px;
+      outline: none; transition: border-color .25s, box-shadow .25s; resize: vertical; width: 100%;
     }
-    .contact-form input:focus, .contact-form textarea:focus { border-color:rgba(0,230,180,.5); box-shadow:0 0 0 2px rgba(0,230,180,.08); }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: rgba(0,230,180,.5); box-shadow: 0 0 0 2px rgba(0,230,180,.08); }
     .contact-form button {
-      background:rgba(0,230,180,.1); border:1px solid rgba(0,230,180,.35); border-radius:4px;
-      color:var(--green); font-family:var(--mono); font-size:.78rem; letter-spacing:.15em;
-      padding:12px 28px; cursor:pointer; text-transform:uppercase; transition:background .25s, box-shadow .25s; align-self:flex-start;
+      background: rgba(0,230,180,.1); border: 1px solid rgba(0,230,180,.35); border-radius: 4px;
+      color: var(--green); font-family: var(--mono); font-size: .78rem; letter-spacing: .15em;
+      padding: 12px 28px; cursor: pointer; text-transform: uppercase;
+      transition: background .25s, box-shadow .25s; align-self: flex-start;
     }
-    .contact-form button:hover { background:rgba(0,230,180,.18); box-shadow:0 0 20px rgba(0,230,180,.15); }
-    .footer-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:28px; margin:36px 0 24px; }
-    .footer-col h3 { font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; color:var(--green); text-transform:uppercase; margin-bottom:12px; }
-    .footer-col p { font-size:.85rem; color:var(--muted); margin-bottom:6px; }
-    .footer-col a { color:var(--muted); text-decoration:none; transition:color .2s; }
-    .footer-col a:hover { color:var(--green); }
-    .footer-col a i { margin-right:6px; }
-    .footer-col a p { color:inherit; }
-    .footer-credit { font-family:var(--mono); font-size:.7rem; color:var(--muted); letter-spacing:.1em; text-align:center; padding:20px 0 0; border-top:1px solid var(--border); margin-top:8px; }
+    .contact-form button:hover { background: rgba(0,230,180,.18); box-shadow: 0 0 20px rgba(0,230,180,.15); }
+    .contact-info { display: flex; flex-direction: column; gap: 14px; }
+    .contact-info-card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px 24px; backdrop-filter: blur(8px); }
+    .contact-info-card h4 { font-family: var(--mono); font-size: .68rem; letter-spacing: .2em; color: var(--green); text-transform: uppercase; margin-bottom: 12px; }
+    .contact-info-card p, .contact-info-card a { font-size: .88rem; color: var(--muted); display: block; margin-bottom: 6px; text-decoration: none; transition: color .2s; }
+    .contact-info-card a:hover { color: var(--green); }
+    .contact-info-card a i { margin-right: 8px; color: var(--green); }
+    .contact-socials { display: flex; gap: 10px; flex-wrap: wrap; }
+    .contact-social-btn {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); background: rgba(8,18,38,.8); border: 1px solid var(--border);
+      padding: 8px 14px; border-radius: 4px; text-decoration: none;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .contact-social-btn:hover { color: var(--green); border-color: rgba(0,230,180,.4); background: rgba(0,230,180,.06); }
+
+    /* ── VEILLE INLINE STYLES ── */
+    .highlight { color: var(--green); font-weight: 600; }
+    .hl-red    { color: var(--red);   font-weight: 600; }
+    .hl-blue   { color: var(--blue);  font-weight: 600; }
+    .hl-yellow { color: var(--yellow);font-weight: 600; }
+
+    .veille-meta-bar { display:flex; gap:14px; flex-wrap:wrap; margin-bottom:36px; }
+    .veille-meta-bar .meta-item { display:flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:7px 16px; font-family:var(--mono); font-size:.75rem; color:var(--muted); backdrop-filter:blur(8px); }
+
+    .intro-panel { background:var(--panel); border:1px solid var(--border); border-left:3px solid var(--green); border-radius:6px; padding:32px 36px; backdrop-filter:blur(12px); margin-bottom:40px; }
+    .intro-panel p { font-size:.95rem; line-height:1.85; color:var(--text); }
+    .intro-panel p + p { margin-top:14px; }
+
+    .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:40px; }
+    .stat-card { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:22px 18px; text-align:center; backdrop-filter:blur(8px); transition:border-color .3s,transform .3s; position:relative; overflow:hidden; }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+    .stat-card.g::before { background:var(--green); }
+    .stat-card.r::before { background:var(--red); }
+    .stat-card.b::before { background:var(--blue); }
+    .stat-card.y::before { background:var(--yellow); }
+    .stat-card:hover { transform:translateY(-4px); border-color:rgba(0,230,180,.4); }
+    .stat-number { font-family:var(--mono); font-size:2rem; font-weight:700; line-height:1; margin-bottom:8px; }
+    .stat-card.g .stat-number { color:var(--green); text-shadow:0 0 20px rgba(0,230,180,.4); }
+    .stat-card.r .stat-number { color:var(--red);   text-shadow:0 0 20px rgba(255,61,107,.4); }
+    .stat-card.b .stat-number { color:var(--blue);  text-shadow:0 0 20px rgba(0,170,255,.4); }
+    .stat-card.y .stat-number { color:var(--yellow);text-shadow:0 0 20px rgba(255,209,102,.4); }
+    .stat-label { font-size:.75rem; color:var(--muted); }
+
+    .threat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-bottom:40px; }
+    .threat-card { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:26px; backdrop-filter:blur(10px); transition:border-color .3s,box-shadow .3s,transform .3s; }
+    .threat-card:hover { border-color:rgba(0,230,180,.4); box-shadow:0 8px 40px rgba(0,230,180,.08); transform:translateY(-3px); }
+    .threat-icon { width:42px; height:42px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:14px; }
+    .threat-icon.red    { background:rgba(255,61,107,.12);  border:1px solid rgba(255,61,107,.3); }
+    .threat-icon.orange { background:rgba(255,140,0,.12);   border:1px solid rgba(255,140,0,.3); }
+    .threat-icon.blue   { background:rgba(0,170,255,.12);   border:1px solid rgba(0,170,255,.3); }
+    .threat-icon.yellow { background:rgba(255,209,102,.12); border:1px solid rgba(255,209,102,.3); }
+    .threat-icon.purple { background:rgba(180,80,255,.12);  border:1px solid rgba(180,80,255,.3); }
+    .threat-icon.green  { background:rgba(0,230,180,.12);   border:1px solid rgba(0,230,180,.3); }
+    .threat-name { font-family:var(--head); font-size:1.1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
+    .threat-desc { font-size:.87rem; color:var(--text); line-height:1.7; }
+    .threat-level { display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:.66rem; letter-spacing:.15em; padding:3px 10px; border-radius:2px; margin-top:12px; }
+    .threat-level.critique { background:rgba(255,61,107,.15);  color:var(--red);    border:1px solid rgba(255,61,107,.3); }
+    .threat-level.eleve    { background:rgba(255,140,0,.15);   color:#ff8c00;        border:1px solid rgba(255,140,0,.3); }
+    .threat-level.moyen    { background:rgba(255,209,102,.15); color:var(--yellow);  border:1px solid rgba(255,209,102,.3); }
+
+    .v-terminal { background:#020810; border:1px solid rgba(0,230,180,.2); border-radius:8px; margin-bottom:40px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+    .terminal-bar { background:rgba(0,230,180,.06); border-bottom:1px solid rgba(0,230,180,.15); padding:10px 16px; display:flex; align-items:center; gap:8px; }
+    .t-dot { width:10px; height:10px; border-radius:50%; }
+    .t-dot.r { background:#ff5f57; } .t-dot.y { background:#ffbd2e; } .t-dot.g { background:#28c840; }
+    .terminal-title { font-family:var(--mono); font-size:.72rem; color:var(--muted); margin-left:8px; letter-spacing:.1em; }
+    .terminal-body { padding:22px 26px; font-family:var(--mono); font-size:.82rem; line-height:2; }
+    .t-prompt { color:var(--green); } .t-cmd { color:#e2f0ff; } .t-comment { color:var(--muted); }
+    .t-ok { color:var(--green); } .t-warn { color:var(--yellow); } .t-err { color:var(--red); }
+    .t-info { color:var(--blue); } .t-blank { display:block; height:8px; }
+    @keyframes blink { 0%,100%{opacity:1} 49%{opacity:1} 50%{opacity:0} 99%{opacity:0} }
+    .cursor::after { content:'█'; animation:blink 1s step-end infinite; color:var(--green); font-size:.8em; }
+
+    .practices-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; margin-bottom:40px; }
+    .practice-card { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:26px; backdrop-filter:blur(10px); transition:border-color .3s,transform .3s; }
+    .practice-card:hover { border-color:rgba(0,230,180,.35); transform:translateY(-3px); }
+    .practice-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+    .practice-num { font-family:var(--mono); font-size:.7rem; color:var(--green); background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.25); width:32px; height:32px; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .practice-title { font-family:var(--head); font-size:1rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.05em; }
+    .practice-list { list-style:none; display:flex; flex-direction:column; gap:7px; }
+    .practice-list li { font-size:.86rem; color:var(--text); display:flex; gap:10px; align-items:flex-start; }
+    .practice-list li::before { content:'▸'; color:var(--green); flex-shrink:0; margin-top:1px; }
+
+    .awareness-block { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:32px; backdrop-filter:blur(10px); margin-bottom:40px; }
+    .steps-list { display:flex; flex-direction:column; gap:16px; margin-top:20px; }
+    .step-item { display:grid; grid-template-columns:44px 1fr; gap:14px; align-items:start; }
+    .step-num { font-family:var(--mono); font-size:.72rem; background:rgba(0,230,180,.08); border:1px solid rgba(0,230,180,.2); color:var(--green); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:4px; flex-shrink:0; }
+    .step-content h4 { font-family:var(--head); font-weight:700; font-size:.98rem; color:#fff; letter-spacing:.05em; text-transform:uppercase; margin-bottom:3px; }
+    .step-content p { font-size:.86rem; color:var(--text); }
+
+    .alert-box { background:rgba(255,61,107,.06); border:1px solid rgba(255,61,107,.25); border-left:3px solid var(--red); border-radius:6px; padding:20px 24px; margin-bottom:40px; display:flex; gap:14px; align-items:flex-start; }
+    .alert-icon { font-size:1.3rem; flex-shrink:0; margin-top:2px; }
+    .alert-box h4 { font-family:var(--head); font-weight:700; color:var(--red); text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+    .alert-box p { font-size:.87rem; color:var(--text); }
+
+    .tools-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:40px; }
+    .tool-card { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:18px; display:flex; flex-direction:column; gap:8px; backdrop-filter:blur(8px); transition:border-color .3s,transform .3s; }
+    .tool-card:hover { border-color:rgba(0,230,180,.4); transform:translateY(-3px); }
+    .tool-emoji { font-size:1.5rem; }
+    .tool-name { font-family:var(--head); font-weight:700; font-size:.92rem; color:#fff; text-transform:uppercase; letter-spacing:.05em; }
+    .tool-cat { font-family:var(--mono); font-size:.65rem; color:var(--green); letter-spacing:.15em; }
+    .tool-desc { font-size:.8rem; color:var(--muted); }
+
+    .conclusion-block { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:36px; text-align:center; backdrop-filter:blur(12px); position:relative; overflow:hidden; margin-bottom:40px; }
+    .conclusion-block::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 0%,rgba(0,230,180,.06) 0%,transparent 70%); pointer-events:none; }
+    .conclusion-block h3 { font-family:var(--head); font-size:1.5rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.08em; margin-bottom:12px; position:relative; }
+    .conclusion-block p { font-size:.93rem; color:var(--text); max-width:640px; margin:0 auto; line-height:1.8; position:relative; }
+    .conclusion-sources { margin-top:20px; font-family:var(--mono); font-size:.68rem; color:var(--muted); letter-spacing:.1em; position:relative; }
+
+    .v-section { margin-bottom:40px; }
+
+    /* ── ACTIVE DIRECTORY DEEP DIVE ── */
+    .veille-separator {
+      display: flex; align-items: center; gap: 16px;
+      margin: 56px 0 48px;
+    }
+    .veille-separator::before, .veille-separator::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,230,180,.3), transparent);
+    }
+    .veille-separator-label {
+      font-family: var(--mono); font-size: .62rem; letter-spacing: .25em;
+      color: var(--green); text-transform: uppercase; white-space: nowrap;
+      border: 1px solid rgba(0,230,180,.25); padding: 5px 14px; border-radius: 2px;
+      background: rgba(0,230,180,.04);
+    }
+
+    .ad-intro {
+      background: linear-gradient(135deg, rgba(10,25,50,.85) 0%, rgba(20,10,40,.85) 100%);
+      border: 1px solid rgba(0,170,255,.25); border-left: 3px solid var(--blue);
+      border-radius: 6px; padding: 28px 32px; backdrop-filter: blur(12px); margin-bottom: 32px;
+    }
+    .ad-intro p { font-size: .93rem; color: var(--text); line-height: 1.85; }
+    .ad-intro p + p { margin-top: 10px; }
+
+    .killchain {
+      background: #020810; border: 1px solid rgba(0,170,255,.2); border-radius: 8px;
+      margin-bottom: 40px; overflow: hidden;
+    }
+    .killchain-bar {
+      background: rgba(0,170,255,.06); border-bottom: 1px solid rgba(0,170,255,.15);
+      padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .killchain-title { font-family: var(--mono); font-size: .72rem; color: var(--muted); margin-left: 8px; letter-spacing: .1em; }
+    .killchain-body { padding: 20px 26px; }
+    .kc-step {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 12px 0; border-bottom: 1px solid rgba(0,170,255,.07);
+    }
+    .kc-step:last-child { border-bottom: none; }
+    .kc-num {
+      font-family: var(--mono); font-size: .65rem; color: var(--blue);
+      background: rgba(0,170,255,.1); border: 1px solid rgba(0,170,255,.25);
+      width: 28px; height: 28px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .kc-content { flex: 1; }
+    .kc-phase { font-family: var(--mono); font-size: .65rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 2px; }
+    .kc-action { font-family: var(--mono); font-size: .82rem; color: #e2f0ff; }
+    .kc-detail { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+    .kc-tool { font-family: var(--mono); font-size: .66rem; color: var(--red); background: rgba(255,61,107,.08); border: 1px solid rgba(255,61,107,.2); padding: 1px 7px; border-radius: 2px; margin-left: 8px; }
+    .kc-arrow { color: var(--blue); font-size: .7rem; padding-top: 6px; flex-shrink: 0; opacity: .5; }
+
+    .tier-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 32px; }
+    .tier-card { border-radius: 6px; padding: 22px; text-align: center; backdrop-filter: blur(8px); }
+    .tier-card.t0 { background: rgba(255,61,107,.08); border: 1px solid rgba(255,61,107,.3); }
+    .tier-card.t1 { background: rgba(255,209,102,.06); border: 1px solid rgba(255,209,102,.25); }
+    .tier-card.t2 { background: rgba(0,230,180,.06); border: 1px solid rgba(0,230,180,.2); }
+    .tier-badge { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+    .tier-card.t0 .tier-badge { color: var(--red); }
+    .tier-card.t1 .tier-badge { color: var(--yellow); }
+    .tier-card.t2 .tier-badge { color: var(--green); }
+    .tier-name { font-family: var(--head); font-size: .95rem; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+    .tier-desc { font-size: .78rem; color: var(--muted); line-height: 1.6; }
+    .tier-rule {
+      background: rgba(0,0,0,.3); border: 1px solid rgba(255,61,107,.2); border-left: 3px solid var(--red);
+      border-radius: 4px; padding: 14px 20px; margin-bottom: 20px;
+      font-size: .88rem; color: var(--text); line-height: 1.7;
+    }
+
+    .event-table-wrap { overflow-x: auto; margin-bottom: 40px; }
+    .event-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: .78rem; }
+    .event-table thead th {
+      background: rgba(0,230,180,.07); border: 1px solid rgba(0,230,180,.15);
+      color: var(--green); letter-spacing: .12em; text-transform: uppercase;
+      padding: 10px 14px; text-align: left; font-weight: normal; font-size: .65rem;
+    }
+    .event-table tbody tr { border-bottom: 1px solid rgba(0,230,180,.07); transition: background .15s; }
+    .event-table tbody tr:hover { background: rgba(0,230,180,.04); }
+    .event-table td { padding: 10px 14px; color: var(--text); vertical-align: top; }
+    .event-table .ev-id { color: var(--green); font-size: .85rem; }
+    .event-table .ev-critical { color: var(--red); font-size: .65rem; border: 1px solid rgba(255,61,107,.3); background: rgba(255,61,107,.08); padding: 1px 6px; border-radius: 2px; }
+    .event-table .ev-high { color: var(--yellow); font-size: .65rem; border: 1px solid rgba(255,209,102,.3); background: rgba(255,209,102,.08); padding: 1px 6px; border-radius: 2px; }
+    .event-table .ev-medium { color: var(--blue); font-size: .65rem; border: 1px solid rgba(0,170,255,.3); background: rgba(0,170,255,.08); padding: 1px 6px; border-radius: 2px; }
+
+    .ad-tools-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; margin-bottom: 40px; }
+    .ad-tool-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+      padding: 18px; display: flex; flex-direction: column; gap: 6px; backdrop-filter: blur(8px);
+      transition: border-color .3s, transform .3s;
+    }
+    .ad-tool-card:hover { border-color: rgba(0,230,180,.4); transform: translateY(-3px); }
+    .ad-tool-header { display: flex; align-items: center; justify-content: space-between; }
+    .ad-tool-name { font-family: var(--head); font-weight: 700; font-size: .9rem; color: #fff; text-transform: uppercase; letter-spacing: .04em; }
+    .ad-tool-type { font-family: var(--mono); font-size: .6rem; letter-spacing: .12em; padding: 2px 7px; border-radius: 2px; }
+    .ad-tool-type.red    { color: var(--red);    background: rgba(255,61,107,.1);  border: 1px solid rgba(255,61,107,.25); }
+    .ad-tool-type.blue   { color: var(--blue);   background: rgba(0,170,255,.1);   border: 1px solid rgba(0,170,255,.25); }
+    .ad-tool-type.green  { color: var(--green);  background: rgba(0,230,180,.1);   border: 1px solid rgba(0,230,180,.25); }
+    .ad-tool-type.yellow { color: var(--yellow); background: rgba(255,209,102,.1); border: 1px solid rgba(255,209,102,.25); }
+    .ad-tool-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+
+    .sources-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .source-chip {
+      font-family: var(--mono); font-size: .65rem; letter-spacing: .1em; color: var(--muted);
+      border: 1px solid var(--border); padding: 4px 12px; border-radius: 2px;
+      text-decoration: none; transition: color .2s, border-color .2s;
+    }
+    .source-chip:hover { color: var(--green); border-color: rgba(0,230,180,.4); }
+
+    /* ── FOOTER CREDIT ── */
+    .footer-credit { font-family: var(--mono); font-size: .68rem; color: var(--muted); letter-spacing: .1em; margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); }
 
     /* ── ANIMATIONS ── */
-    @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-    @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.3} }
-    .reveal { opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease; }
+    @keyframes pageFadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pulse      { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .reveal { opacity:0; transform:translateY(20px); transition:opacity .5s ease, transform .5s ease; }
     .reveal.visible { opacity:1; transform:translateY(0); }
 
     /* ── RESPONSIVE ── */
-    @media(max-width:768px) {
-      .about-layout { grid-template-columns:1fr; }
-      .bts-grid { grid-template-columns:1fr; }
-      .bts-block.full { grid-column:1; }
-      .nav-links { display:none; }
+    @media (max-width: 900px) {
+      .about-layout { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
     }
-    @media(max-width:480px) {
-      .veille-card { grid-template-columns:1fr; }
-      .veille-card .icon { grid-row:1; width:100%; height:120px; }
-      .veille-card h3, .veille-card p, .veille-card a { grid-column:1; }
+    @media (max-width: 768px) {
+      .sidebar {
+        left: calc(-1 * var(--sidebar-w));
+        top: 52px;
+        height: calc(100vh - 52px);
+        transition: left .3s ease;
+      }
+      .sidebar.open { left: 0; }
+      .mobile-topbar { display: flex; }
+      .main-content { margin-left: 0; padding: 72px 24px 60px; }
+      .bts-grid { grid-template-columns: 1fr; }
+      .bts-block.full { grid-column: 1; }
+      .veille-link-card { grid-template-columns: 1fr; }
+      .veille-card-visual { display: none; }
+      .tableau-banner { grid-template-columns: 1fr; }
+      .tableau-icon { display: none; }
     }
   </style>
 </head>
@@ -321,55 +668,87 @@
 
 <canvas id="matrix-canvas"></canvas>
 
-<!-- STICKY NAV -->
-<nav class="sticky-nav">
-  <div class="nav-inner">
-    <a href="#hero" class="nav-brand">VT://</a>
-    <ul class="nav-links">
-      <li><a href="#about">À propos</a></li>
-      <li><a href="#bts">BTS SIO</a></li>
-      <li><a href="#projects">Projets</a></li>
-      <li><a href="#veille-hardware">Veille</a></li>
-      <li><a href="#entreprise">Entreprise</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar">
+  <span class="mobile-brand">VT://</span>
+  <button class="sidebar-toggle" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">VT://PORTFOLIO</span>
+    <span class="sidebar-brand-sub">BTS SIO SISR · 2024–2026</span>
   </div>
-</nav>
-
-<div class="wrapper">
-
-  <!-- HERO -->
-  <div id="hero" class="hero">
-    <div class="hero-badge">// PORTFOLIO — BTS SIO SISR</div>
-    <h1><span>Victor</span> Trioux</h1>
-    <p class="hero-sub">Étudiant en BTS SIO — Option SISR · Alternant chez Tersedia</p>
-    <div class="hero-meta">
-      <div class="meta-chip"><span class="dot"></span> BTS SIO — Option SISR</div>
-      <div class="meta-chip"><span class="dot"></span> Alternance · Tersedia</div>
-      <div class="meta-chip"><span class="dot"></span> Ensitech · 2024–2026</div>
+  <ul class="sidebar-nav">
+    <li class="sidebar-nav-item active" data-page="page-accueil">
+      <i class="fas fa-home"></i> <span class="nav-label">Accueil</span> <span class="nav-num">01</span>
+    </li>
+    <li class="sidebar-nav-item" data-page="page-bts">
+      <i class="fas fa-graduation-cap"></i> <span class="nav-label">BTS SIO</span> <span class="nav-num">02</span>
+    </li>
+    <li class="sidebar-nav-item" data-page="page-projets">
+      <i class="fas fa-folder-open"></i> <span class="nav-label">Projets</span> <span class="nav-num">03</span>
+    </li>
+    <li class="sidebar-nav-item" data-page="page-veille">
+      <i class="fas fa-shield-alt"></i> <span class="nav-label">Veille</span> <span class="nav-num">04</span>
+    </li>
+    <li class="sidebar-nav-item" data-page="page-entreprise">
+      <i class="fas fa-building"></i> <span class="nav-label">Entreprise</span> <span class="nav-num">05</span>
+    </li>
+    <li class="sidebar-nav-item" data-page="page-contact">
+      <i class="fas fa-envelope"></i> <span class="nav-label">Contact</span> <span class="nav-num">06</span>
+    </li>
+  </ul>
+  <button class="sidebar-collapser" id="sidebarCollapser">
+    <i class="fas fa-chevron-left" id="collapserIcon"></i>
+    <span class="collapser-label">Réduire</span>
+  </button>
+  <div class="sidebar-footer">
+    <div class="sidebar-socials">
+      <a href="https://www.linkedin.com/in/ton-profil" target="_blank" class="sidebar-social-link"><i class="fab fa-linkedin"></i></a>
+      <a href="https://github.com/ton-pseudo" target="_blank" class="sidebar-social-link"><i class="fab fa-github"></i></a>
+      <a href="mailto:victor.trioux@gmail.com" class="sidebar-social-link"><i class="fas fa-envelope"></i></a>
     </div>
-    <div class="hero-line"></div>
+    <p class="sidebar-copy">© 2025 Victor Trioux</p>
   </div>
+</aside>
 
-  <!-- TABLEAU E5 -->
-  <a href="proe/E5_Tableau_de_synthese.pdf" target="_blank" class="tableau-banner reveal">
-    <div class="tableau-icon"><i class="fas fa-table"></i></div>
-    <div class="tableau-body">
-      <div class="tableau-eyebrow">// Épreuve E5 — BTS SIO SISR</div>
-      <div class="tableau-title">Tableau de Synthèse des Compétences</div>
-      <div class="tableau-desc">Récapitulatif de l'ensemble des compétences et situations professionnelles développées au cours de la formation et de l'alternance.</div>
+<!-- MAIN CONTENT -->
+<main class="main-content" id="mainContent">
+
+  <!-- ═══════════════════════════════════════════════ PAGE: ACCUEIL -->
+  <div class="page active" id="page-accueil">
+
+    <div class="hero reveal">
+      <div class="hero-badge">// PORTFOLIO — BTS SIO SISR</div>
+      <h1><span>Victor</span> Trioux</h1>
+      <p class="hero-sub">Étudiant en BTS SIO — Option SISR · Alternant chez Tersedia</p>
+      <div class="hero-meta">
+        <div class="meta-chip"><span class="dot"></span> BTS SIO — Option SISR</div>
+        <div class="meta-chip"><span class="dot"></span> Alternance · Tersedia</div>
+        <div class="meta-chip"><span class="dot"></span> Ensitech · 2024–2026</div>
+      </div>
+      <div class="hero-line"></div>
     </div>
-    <span class="tableau-cta">Consulter le tableau <i class="fas fa-arrow-right"></i></span>
-  </a>
 
-  <!-- ABOUT -->
-  <section id="about" class="content-section reveal">
-    <div class="section-label">01 — À propos</div>
-    <h2 class="section-title">Qui suis-je ?</h2>
-    <div class="about-layout">
+    <a href="proe/E5_Tableau_de_synthese.pdf" target="_blank" class="tableau-banner reveal">
+      <div class="tableau-icon"><i class="fas fa-table"></i></div>
+      <div class="tableau-body">
+        <div class="tableau-eyebrow">// Épreuve E5 — BTS SIO SISR</div>
+        <div class="tableau-title">Tableau de Synthèse des Compétences</div>
+        <div class="tableau-desc">Récapitulatif de l'ensemble des compétences et situations professionnelles développées au cours de la formation et de l'alternance.</div>
+      </div>
+      <span class="tableau-cta">Consulter le tableau <i class="fas fa-arrow-right"></i></span>
+    </a>
+
+    <div class="about-layout reveal">
       <div class="about-text">
         <p>Passionné d'informatique depuis mon plus jeune âge, j'ai naturellement choisi d'orienter mes études dans ce domaine. J'ai d'abord suivi un Bac SN, qui m'a permis de comprendre plus en profondeur le fonctionnement des systèmes d'information.</p>
-        <p>Je poursuis aujourd'hui un BTS SIO, spécialité SISR, au sein de l'établissement <a href="https://www.ensitech.eu/nos-campus/campus-de-saint-quentin-en-yvelines/?utm_source=google&utm_medium=cpc&utm_campaign=ensitech-sea-marque&utm_id=22089478507&utm_term=ensitech%20montigny&utm_content=172236521999&gad_source=1&gad_campaignid=22089478507&gclid=Cj0KCQjwpv7NBhCzARIsADkIfWwAWrbsVPMA_XMKuRoh63gNGzTLtkx_9DT5sycP3lg8f-TkSZCMnZAaAtNCEALw_wcB" target="_blank">Ensitech</a>, dans le but de continuer à évoluer dans cette voie.</p>
+        <p>Je poursuis aujourd'hui un BTS SIO, spécialité SISR, au sein de l'établissement <a href="https://www.ensitech.eu/" target="_blank">Ensitech</a>, dans le but de continuer à évoluer dans cette voie.</p>
         <p>Mes différentes expériences en milieu professionnel ont renforcé ma motivation et m'ont permis d'élargir mes compétences, notamment dans l'assistance aux utilisateurs, ainsi que dans l'administration des systèmes et réseaux.</p>
         <p>Elles ont également confirmé mon envie de travailler dans un environnement technique où je peux apprendre, résoudre des problèmes et progresser continuellement.</p>
       </div>
@@ -390,13 +769,17 @@
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- BTS SIO -->
-  <section id="bts" class="content-section reveal">
-    <div class="section-label">02 — Formation</div>
-    <h2 class="section-title">BTS SIO — SISR</h2>
-    <div class="bts-grid">
+    <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ PAGE: BTS SIO -->
+  <div class="page" id="page-bts">
+    <div class="page-header">
+      <div class="section-label">02 — Formation</div>
+      <h2 class="section-title">BTS SIO — SISR</h2>
+    </div>
+    <div class="bts-grid reveal">
       <div class="bts-block full">
         <h4>// présentation</h4>
         <p>Le BTS SIO (Services Informatiques aux Organisations), option SISR (Solutions d'Infrastructure, Systèmes et Réseaux), est une formation qui prépare les étudiants à devenir des professionnels capables de gérer et d'administrer des infrastructures informatiques et des réseaux au sein des entreprises. Ce diplôme de niveau Bac+2 permet d'acquérir des compétences techniques pointues tout en développant des aptitudes à résoudre des problématiques concrètes liées aux systèmes d'information.</p>
@@ -410,8 +793,8 @@
         <p>Gestion des réseaux et systèmes (LAN, WAN, DNS, DHCP, FTP). Virtualisation et cloud computing. Sécurité informatique : firewalls, VPN, détection d'intrusion. Systèmes d'exploitation : Windows Server, Linux. Gestion de projet informatique et méthodologie. Maintenance préventive et curative des infrastructures.</p>
       </div>
     </div>
-    <p class="career-label">// débouchés métiers</p>
-    <div class="career-grid">
+    <p class="career-label reveal">// débouchés métiers</p>
+    <div class="career-grid reveal">
       <a href="https://nextformation.com/fiches-metiers/fiche-metier-administrateur-systeme-et-reseaux" target="_blank" class="career-link">Administrateur système et réseaux</a>
       <a href="https://www.hellowork.com/fr-fr/metiers/technicien-support-informatique.html" target="_blank" class="career-link">Technicien support informatique</a>
       <a href="https://www.onisep.fr/ressources/univers-metier/metiers/technicien-technicienne-telecoms-et-reseaux" target="_blank" class="career-link">Technicien réseau</a>
@@ -419,82 +802,592 @@
       <a href="https://www.manpower.fr/responsable-informatique" target="_blank" class="career-link">Responsable informatique PME/ETI</a>
       <a href="https://www.hellowork.com/fr-fr/metiers/ingenieur-systemes-et-reseaux.html" target="_blank" class="career-link">Ingénieur systèmes et réseaux</a>
     </div>
-  </section>
+    <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
+  </div>
 
-  <!-- PROJETS -->
-  <section id="projects" class="content-section reveal">
-    <div class="section-label">03 — Projets E5</div>
-    <h2 class="section-title">Mes Projets</h2>
-    <p class="projects-intro">
+  <!-- ═══════════════════════════════════════════════ PAGE: PROJETS -->
+  <div class="page" id="page-projets">
+    <div class="page-header">
+      <div class="section-label">03 — Projets E5</div>
+      <h2 class="section-title">Mes Projets</h2>
+    </div>
+    <p class="projects-intro reveal">
       Retrouvez mes projets réalisés en BTS SIO. Cliquez sur une image pour accéder au document associé.
       <a href="tets.html" target="_blank">Voir tous les projets →</a>
     </p>
-    <div class="project-gallery">
-      <a href="Installer GLPI sur ubuntu.pdf" target="_blank">
+    <div class="project-gallery reveal">
+      <a href="proe/Installer GLPI sur ubuntu.pdf" target="_blank">
         <img src="https://www.bujarra.com/wp-content/uploads/2021/09/GLPI-Instalar-00.png?v=1630864335" alt="GLPI">
       </a>
-      <a href="Installation win-srv-ad-dns.pdf" target="_blank">
+      <a href="proe/Installation win-srv-ad-dns.pdf" target="_blank">
         <img src="https://adeo-informatique.fr/wp-content/uploads/2020/01/windows-server-2019-adeo-informatique.png" alt="Windows Server">
       </a>
-      <a href="Procédure de création VPN SSL forti.pdf" target="_blank">
+      <a href="prot/Procédure de création VPN SSL forti.pdf" target="_blank">
         <img src="https://s3.amazonaws.com/www-itopvpn-com/blog/20230731/1690783438456952.jpeg" alt="VPN">
       </a>
-      <a href="Pour commencer l'installation de TrueNAS SCALE.pdf" target="_blank">
+      <a href="prot/Pour commencer l'installation de TrueNAS SCALE.pdf" target="_blank">
         <img src="https://linuxiac.com/wp-content/uploads/2024/06/truenas-scale-docker.jpg" alt="TrueNAS">
       </a>
     </div>
-  </section>
+    <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
+  </div>
 
-  <!-- VEILLE -->
-  <section id="veille-hardware" class="content-section reveal">
-    <div class="section-label">04 — Veille technologique</div>
-    <h2 class="section-title">Veille Technologique</h2>
-    <div class="veille-link-card" onclick="window.open('veille_cybersecurite_bts_sio.html','_blank')">
-      <div class="veille-card-content">
-        <div class="veille-card-badge">// VEILLE — BTS SIO SISR</div>
-        <div class="veille-card-title"><span>Cybersécurité</span><br>Se protéger &amp; Protéger</div>
-        <p class="veille-card-desc">
-          Panorama complet des cybermenaces actuelles, bonnes pratiques de sécurité, boîte à outils professionnelle et stratégies de sensibilisation des utilisateurs — dans le contexte du technicien SISR.
-        </p>
-        <div class="veille-card-tags">
-          <span class="veille-tag">MENACES</span>
-          <span class="veille-tag">BONNES PRATIQUES</span>
-          <span class="veille-tag">OUTILS</span>
-          <span class="veille-tag">SENSIBILISATION</span>
-          <span class="veille-tag">RGPD · NIS2</span>
-        </div>
-        <a href="veille_cybersecurite_bts_sio.html" target="_blank" class="btn-veille" onclick="event.stopPropagation()">
-          Accéder à la veille <i class="fas fa-arrow-right"></i>
-        </a>
+  <!-- ═══════════════════════════════════════════════ PAGE: VEILLE -->
+  <div class="page" id="page-veille">
+    <div class="page-header">
+      <div class="section-label">04 — Veille technologique</div>
+      <h2 class="section-title">Veille Cybersécurité</h2>
+    </div>
+
+    <!-- Meta bar -->
+    <div class="veille-meta-bar reveal">
+      <div class="meta-item"><span class="dot"></span> Année 2024–2025</div>
+      <div class="meta-item"><span class="dot"></span> BTS SIO — Option SISR</div>
+      <div class="meta-item"><span class="dot"></span> Thème : Cybersécurité</div>
+      <div class="meta-item"><span class="dot"></span> Veille Technologique</div>
+    </div>
+
+    <!-- 01 Intro -->
+    <div class="v-section reveal">
+      <div class="section-label">01 — Introduction</div>
+      <h2 class="section-title">Contexte &amp; Enjeux</h2>
+      <div class="intro-panel">
+        <p>Dans un monde où la <span class="highlight">transformation numérique</span> s'accélère, la cybersécurité est devenue un pilier fondamental pour toute organisation, quelle que soit sa taille. Les cyberattaques se multiplient, se sophistiquent et causent des pertes colossales : en 2024, le coût mondial de la cybercriminalité a dépassé <span class="hl-red">8 000 milliards de dollars</span>.</p>
+        <p>En tant que technicien réseau et systèmes (SISR), vous êtes en première ligne. Votre rôle dépasse la simple gestion d'infrastructure : <span class="highlight">vous êtes le gardien des données et des utilisateurs</span>. Cette veille vous donne les clés pour comprendre les menaces actuelles et mettre en œuvre des protections efficaces.</p>
+        <p>La sécurité n'est pas un état figé, c'est un <span class="hl-blue">processus continu</span> d'évaluation, d'adaptation et d'amélioration. Ce document explore les menaces les plus critiques et les pratiques recommandées pour construire une posture de sécurité solide.</p>
       </div>
-      <div class="veille-card-visual">
-        <div class="veille-stat">
-          <div class="num">+38%</div>
-          <div class="lbl">Cyberattaques 2024</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row reveal">
+      <div class="stat-card r"><div class="stat-number">+38%</div><div class="stat-label">Hausse des cyberattaques en 2024</div></div>
+      <div class="stat-card y"><div class="stat-number">72h</div><div class="stat-label">Délai moyen de détection d'une intrusion</div></div>
+      <div class="stat-card b"><div class="stat-number">95%</div><div class="stat-label">Des incidents liés à l'erreur humaine</div></div>
+      <div class="stat-card g"><div class="stat-number">3,5M</div><div class="stat-label">Postes en cybersécurité non pourvus</div></div>
+    </div>
+
+    <!-- 02 Menaces -->
+    <div class="v-section reveal">
+      <div class="section-label">02 — Panorama des menaces</div>
+      <h2 class="section-title">Principales Cybermenaces</h2>
+      <div class="threat-grid">
+        <div class="threat-card">
+          <div class="threat-icon red">🎣</div>
+          <div class="threat-name">Phishing &amp; Spear-Phishing</div>
+          <div class="threat-desc">Technique d'ingénierie sociale visant à usurper l'identité d'une entité de confiance pour soutirer des identifiants ou inciter la victime à effectuer une action malveillante. Le spear-phishing cible une personne précise avec un message personnalisé.</div>
+          <span class="threat-level critique">⬤ CRITIQUE</span>
         </div>
-        <div class="veille-stat">
-          <div class="num">95%</div>
-          <div class="lbl">Erreur humaine</div>
+        <div class="threat-card">
+          <div class="threat-icon orange">🔒</div>
+          <div class="threat-name">Ransomware</div>
+          <div class="threat-desc">Logiciel malveillant chiffrant les fichiers de la victime et exigeant une rançon. Les variantes modernes pratiquent la double extorsion : exfiltration des données avant chiffrement pour menacer de les publier.</div>
+          <span class="threat-level critique">⬤ CRITIQUE</span>
         </div>
-        <div class="veille-stat">
-          <div class="num">3,5M</div>
-          <div class="lbl">Postes non pourvus</div>
+        <div class="threat-card">
+          <div class="threat-icon purple">🕵️</div>
+          <div class="threat-name">Man-in-the-Middle</div>
+          <div class="threat-desc">L'attaquant s'intercale entre deux parties communicantes pour intercepter ou modifier les échanges à leur insu. Très fréquente sur les réseaux Wi-Fi publics non chiffrés.</div>
+          <span class="threat-level eleve">⬤ ÉLEVÉ</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon blue">💥</div>
+          <div class="threat-name">Attaque DDoS</div>
+          <div class="threat-desc">Saturation d'un serveur par un flux massif de requêtes issues d'un botnet, le rendant indisponible pour ses utilisateurs légitimes. Les attaques atteignent désormais des débits de plusieurs térabits par seconde.</div>
+          <span class="threat-level eleve">⬤ ÉLEVÉ</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon yellow">🐛</div>
+          <div class="threat-name">Exploitation de vulnérabilités</div>
+          <div class="threat-desc">Utilisation de failles connues (CVE) ou inconnues (zero-day) dans des logiciels ou systèmes d'exploitation. Les CVE critiques sont souvent exploitées dans les 24h suivant leur publication.</div>
+          <span class="threat-level critique">⬤ CRITIQUE</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon green">👤</div>
+          <div class="threat-name">Menace Interne</div>
+          <div class="threat-desc">Risque provenant d'une personne disposant d'accès légitimes : employé malveillant, sous-traitant négligent ou compte compromis. Souvent sous-estimée et difficile à détecter avec les outils classiques.</div>
+          <span class="threat-level moyen">⬤ MOYEN</span>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ENTREPRISE -->
-  <section id="entreprise" class="content-section reveal">
-    <div class="section-label">05 — Entreprise</div>
-    <h2 class="section-title">Tersedia</h2>
-    <div class="certs-row">
+    <!-- Terminal -->
+    <div class="v-terminal reveal">
+      <div class="terminal-bar">
+        <div class="t-dot r"></div><div class="t-dot y"></div><div class="t-dot g"></div>
+        <span class="terminal-title">security-audit.sh — bash — 80×24</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">admin@srv-sio:~$</span> <span class="t-cmd">./security-audit.sh --full-scan</span></div>
+        <div><span class="t-comment"># ═══════════════════════════════════════════════════════════</span></div>
+        <div><span class="t-comment">#   AUDIT DE SÉCURITÉ SYSTÈME — BTS SIO SISR                 </span></div>
+        <div><span class="t-comment"># ═══════════════════════════════════════════════════════════</span></div>
+        <span class="t-blank"></span>
+        <div><span class="t-info">[INFO]</span>  Vérification des mises à jour système .......... <span class="t-ok">[OK]</span></div>
+        <div><span class="t-info">[INFO]</span>  Analyse des ports ouverts (nmap) .............. <span class="t-ok">[OK]</span></div>
+        <div><span class="t-info">[INFO]</span>  Contrôle des règles firewall (iptables) ........ <span class="t-ok">[OK]</span></div>
+        <div><span class="t-info">[INFO]</span>  Vérification des comptes privilégiés ........... <span class="t-warn">[WARN]</span> 2 comptes sans MFA</div>
+        <div><span class="t-info">[INFO]</span>  Contrôle de la politique de mots de passe ....... <span class="t-ok">[OK]</span></div>
+        <div><span class="t-info">[INFO]</span>  Analyse des logs d'authentification ............ <span class="t-warn">[WARN]</span> 14 tentatives échouées (SSH)</div>
+        <div><span class="t-info">[INFO]</span>  Vérification des sauvegardes chiffrées ......... <span class="t-ok">[OK]</span></div>
+        <div><span class="t-info">[INFO]</span>  Scan antivirus (ClamAV) ....................... <span class="t-ok">[CLEAN]</span></div>
+        <div><span class="t-info">[INFO]</span>  Contrôle des certificats SSL/TLS ............... <span class="t-ok">[OK]</span> expire dans 42j</div>
+        <div><span class="t-info">[INFO]</span>  Détection d'intrusion (fail2ban) ............... <span class="t-ok">[ACTIF]</span></div>
+        <span class="t-blank"></span>
+        <div><span class="t-warn">[WARN]</span>  2 actions requises — Activer MFA sur les comptes admin</div>
+        <div><span class="t-warn">[WARN]</span>  Renforcer la règle SSH : interdire root login</div>
+        <span class="t-blank"></span>
+        <div><span class="t-prompt">admin@srv-sio:~$</span> <span class="cursor"></span></div>
+      </div>
+    </div>
+
+    <!-- 03 Bonnes pratiques -->
+    <div class="v-section reveal">
+      <div class="section-label">03 — Bonnes pratiques</div>
+      <h2 class="section-title">Se Protéger : Les Fondamentaux</h2>
+      <div class="practices-grid">
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">01</div><div class="practice-title">Gestion des mots de passe</div></div>
+          <ul class="practice-list">
+            <li>Utiliser un gestionnaire de mots de passe (Bitwarden, KeePass)</li>
+            <li>Générer des mots de passe uniques d'au moins 16 caractères</li>
+            <li>Ne jamais réutiliser un mot de passe sur plusieurs services</li>
+            <li>Activer l'alerte en cas de fuite de données (HaveIBeenPwned)</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">02</div><div class="practice-title">Authentification Multifacteur</div></div>
+          <ul class="practice-list">
+            <li>Activer le MFA sur tous les comptes critiques (admin, messagerie)</li>
+            <li>Préférer une app TOTP (Google Authenticator, Aegis) au SMS</li>
+            <li>Utiliser une clé physique FIDO2/WebAuthn (YubiKey) si possible</li>
+            <li>Générer et stocker les codes de secours en lieu sûr</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">03</div><div class="practice-title">Mises à jour &amp; Patchs</div></div>
+          <ul class="practice-list">
+            <li>Appliquer les mises à jour de sécurité dans les 48h (critiques : immédiatement)</li>
+            <li>Automatiser les mises à jour OS sur les postes utilisateurs</li>
+            <li>Maintenir un inventaire des logiciels et leurs versions (CMDB)</li>
+            <li>Surveiller les CVE publiées sur NVD et ANSSI</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">04</div><div class="practice-title">Moindre Privilège</div></div>
+          <ul class="practice-list">
+            <li>Donner aux utilisateurs uniquement les droits nécessaires à leur mission</li>
+            <li>Utiliser des comptes distincts : admin séparé du compte quotidien</li>
+            <li>Revoir régulièrement les droits accordés (audit trimestriel)</li>
+            <li>Désactiver immédiatement les comptes lors de départs</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">05</div><div class="practice-title">Sauvegardes &amp; PRA</div></div>
+          <ul class="practice-list">
+            <li>Appliquer la règle 3-2-1 : 3 copies, 2 supports différents, 1 hors site</li>
+            <li>Chiffrer les sauvegardes (AES-256) et les tester régulièrement</li>
+            <li>Isoler les sauvegardes du réseau principal (air-gap si possible)</li>
+            <li>Définir un RTO et RPO clairs dans le Plan de Reprise d'Activité</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">06</div><div class="practice-title">Segmentation &amp; Firewall</div></div>
+          <ul class="practice-list">
+            <li>Segmenter le réseau en VLANs (utilisateurs, serveurs, IoT, DMZ)</li>
+            <li>Configurer un firewall avec une politique de refus par défaut</li>
+            <li>Utiliser un IDS/IPS pour détecter les comportements suspects</li>
+            <li>Superviser les flux réseau avec un SIEM (Wazuh, ELK Stack)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 Sensibilisation -->
+    <div class="v-section reveal">
+      <div class="section-label">04 — Protection des utilisateurs</div>
+      <h2 class="section-title">Sensibiliser &amp; Former</h2>
+      <div class="awareness-block">
+        <p style="font-size:.93rem;color:var(--text);"><span class="highlight">95 % des incidents de cybersécurité</span> ont pour origine une erreur humaine. Former et sensibiliser vos utilisateurs est l'investissement le plus rentable que vous puissiez réaliser.</p>
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-num">01</div>
+            <div class="step-content"><h4>Campagnes de phishing simulé</h4><p>Organisez régulièrement des faux phishings internes (GoPhish, KnowBe4) pour identifier les utilisateurs les plus vulnérables et adapter votre programme de formation.</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">02</div>
+            <div class="step-content"><h4>Formations courtes et régulières</h4><p>Préférez des micro-formations de 5 à 10 minutes tous les mois plutôt qu'une formation annuelle. Des plateformes comme Proofpoint ou Root Me Enterprise permettent des parcours gamifiés.</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">03</div>
+            <div class="step-content"><h4>Procédure claire de signalement</h4><p>Mettez en place un canal simple pour que les utilisateurs signalent tout email, lien ou comportement suspect sans crainte d'être jugés. Un signalement rapide peut stopper une attaque.</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">04</div>
+            <div class="step-content"><h4>Charte informatique &amp; PSSI</h4><p>Rédigez et faites signer une charte informatique couvrant l'usage des équipements, l'interdiction d'installer des logiciels non validés, la gestion des données et les sanctions.</p></div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">05</div>
+            <div class="step-content"><h4>Communication sur les incidents</h4><p>Communiquez de façon transparente après un incident. Cela renforce la culture sécurité et montre que les risques sont réels et pris au sérieux par la direction.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert RGPD -->
+    <div class="alert-box reveal">
+      <div class="alert-icon">⚠️</div>
+      <div>
+        <h4>Obligation légale — RGPD &amp; NIS2</h4>
+        <p>Le RGPD impose de signaler toute violation de données à la CNIL dans un délai de <strong>72 heures</strong>. La directive NIS2 (2024) étend ces obligations à de nombreuses nouvelles entités et impose des mesures de sécurité minimales sous peine de sanctions pouvant atteindre <strong>10 millions d'euros ou 2 % du chiffre d'affaires mondial</strong>. La conformité n'est pas optionnelle.</p>
+      </div>
+    </div>
+
+    <!-- 05 Outils -->
+    <div class="v-section reveal">
+      <div class="section-label">05 — Boîte à outils</div>
+      <h2 class="section-title">Outils Recommandés</h2>
+      <div class="tools-grid">
+        <div class="tool-card"><div class="tool-emoji">🔑</div><div class="tool-cat">MOT DE PASSE</div><div class="tool-name">Bitwarden</div><div class="tool-desc">Gestionnaire open-source auto-hébergeable avec partage d'équipe.</div></div>
+        <div class="tool-card"><div class="tool-emoji">🛡️</div><div class="tool-cat">PARE-FEU / IDS</div><div class="tool-name">pfSense</div><div class="tool-desc">Routeur/firewall open-source avec IDS Snort/Suricata intégré.</div></div>
+        <div class="tool-card"><div class="tool-emoji">🔍</div><div class="tool-cat">SIEM / MONITORING</div><div class="tool-name">Wazuh</div><div class="tool-desc">Plateforme SIEM open-source pour la détection d'intrusions et la conformité.</div></div>
+        <div class="tool-card"><div class="tool-emoji">🧪</div><div class="tool-cat">SCAN DE VULNÉ.</div><div class="tool-name">OpenVAS</div><div class="tool-desc">Scanner de vulnérabilités open-source, référence pour les audits réseau.</div></div>
+        <div class="tool-card"><div class="tool-emoji">🔐</div><div class="tool-cat">CHIFFREMENT</div><div class="tool-name">VeraCrypt</div><div class="tool-desc">Chiffrement de disques à la volée, successeur de TrueCrypt, audité.</div></div>
+        <div class="tool-card"><div class="tool-emoji">🌐</div><div class="tool-cat">VPN D'ENTREPRISE</div><div class="tool-name">WireGuard</div><div class="tool-desc">Protocole VPN moderne, rapide, léger et facile à auditer.</div></div>
+        <div class="tool-card"><div class="tool-emoji">📧</div><div class="tool-cat">PHISHING SIMULÉ</div><div class="tool-name">GoPhish</div><div class="tool-desc">Framework open-source pour campagnes de phishing de sensibilisation.</div></div>
+        <div class="tool-card"><div class="tool-emoji">📦</div><div class="tool-cat">SAUVEGARDE</div><div class="tool-name">Restic</div><div class="tool-desc">Sauvegarde chiffrée, dédupliquée et vérifiable, multi-destinations.</div></div>
+      </div>
+    </div>
+
+    <!-- 06 Conclusion -->
+    <div class="v-section reveal">
+      <div class="section-label">06 — Synthèse</div>
+      <h2 class="section-title">Conclusion</h2>
+      <div class="conclusion-block">
+        <h3>La sécurité est l'affaire de tous</h3>
+        <p>La cybersécurité ne repose pas sur un seul outil ou une seule mesure. C'est une <span class="highlight">défense en profondeur</span> : des couches techniques solides, une politique claire, des utilisateurs formés et une veille constante sur les nouvelles menaces. En tant que technicien SISR, vous avez les compétences pour construire et maintenir cet écosystème.</p>
+        <div class="conclusion-sources">ANSSI · CERT-FR · MITRE ATT&amp;CK · CVE Database · OWASP</div>
+      </div>
+    </div>
+
+    <!-- ═══ VEILLE APPROFONDIE : ACTIVE DIRECTORY ═══ -->
+    <div class="veille-separator reveal">
+      <span class="veille-separator-label">// Veille approfondie</span>
+    </div>
+
+    <!-- Titre AD -->
+    <div class="v-section reveal">
+      <div class="section-label">07 — Active Directory</div>
+      <h2 class="section-title">Sécurité Active Directory</h2>
+      <div class="ad-intro">
+        <p>Active Directory (AD) est le service d'annuaire de Microsoft utilisé par <span class="hl-blue">90 % des entreprises dans le monde</span> pour gérer les utilisateurs, les machines et les accès. Il est devenu la <span class="highlight">cible principale des attaquants</span> : compromettre un seul compte dans AD peut suffire à obtenir les droits d'administrateur de domaine en quelques heures.</p>
+        <p>En tant que technicien SISR, Active Directory est au cœur de votre quotidien. Comprendre comment il est attaqué — et comment le défendre — est une compétence <span class="highlight">fondamentale et immédiatement applicable</span> en entreprise. Cette veille approfondie vous donne les clés pour passer du rôle d'administrateur à celui de défenseur éclairé.</p>
+      </div>
+    </div>
+
+    <!-- Stats AD -->
+    <div class="stats-row reveal">
+      <div class="stat-card r"><div class="stat-number">88%</div><div class="stat-label">Des ransomwares abusent des identifiants AD pour se propager</div></div>
+      <div class="stat-card b"><div class="stat-number">2h</div><div class="stat-label">Temps moyen pour atteindre Domain Admin après une intrusion</div></div>
+      <div class="stat-card y"><div class="stat-number">80%</div><div class="stat-label">Des cyberattaques exploitent des identifiants légitimes compromis</div></div>
+      <div class="stat-card g"><div class="stat-number">95%</div><div class="stat-label">Des organisations Fortune 500 utilisent Active Directory</div></div>
+    </div>
+
+    <!-- Kill Chain AD -->
+    <div class="v-section reveal">
+      <div class="section-label">Anatomie d'une attaque</div>
+      <h2 class="section-title">Comment un Attaquant Compromet un Domaine</h2>
+      <div class="killchain">
+        <div class="killchain-bar">
+          <div class="t-dot r"></div><div class="t-dot y"></div><div class="t-dot g"></div>
+          <span class="killchain-title">ad-attack-chain.sh — Domain Compromise Simulation</span>
+        </div>
+        <div class="killchain-body">
+          <div class="kc-step">
+            <div class="kc-num">01</div>
+            <div class="kc-content">
+              <div class="kc-phase">Accès initial</div>
+              <div class="kc-action">Phishing → exécution de payload sur un poste utilisateur <span class="kc-tool">Metasploit</span></div>
+              <div class="kc-detail">L'attaquant obtient un shell sur une machine du domaine avec les droits de l'utilisateur connecté</div>
+            </div>
+            <div class="kc-arrow">▼</div>
+          </div>
+          <div class="kc-step">
+            <div class="kc-num">02</div>
+            <div class="kc-content">
+              <div class="kc-phase">Reconnaissance interne</div>
+              <div class="kc-action">Cartographie du domaine AD, énumération des comptes et des groupes <span class="kc-tool">BloodHound</span> <span class="kc-tool">ldapdomaindump</span></div>
+              <div class="kc-detail">Identification des chemins d'attaque vers Domain Admin, des comptes à Kerberoast, des ACL exploitables</div>
+            </div>
+            <div class="kc-arrow">▼</div>
+          </div>
+          <div class="kc-step">
+            <div class="kc-num">03</div>
+            <div class="kc-content">
+              <div class="kc-phase">Élévation de privilèges</div>
+              <div class="kc-action">Kerberoasting sur les comptes de service — cracking offline du hash <span class="kc-tool">Rubeus</span> <span class="kc-tool">Hashcat</span></div>
+              <div class="kc-detail">Récupération du mot de passe d'un compte de service souvent trop privilégié</div>
+            </div>
+            <div class="kc-arrow">▼</div>
+          </div>
+          <div class="kc-step">
+            <div class="kc-num">04</div>
+            <div class="kc-content">
+              <div class="kc-phase">Mouvement latéral</div>
+              <div class="kc-action">Pass-the-Hash / Pass-the-Ticket vers des serveurs sensibles <span class="kc-tool">Mimikatz</span> <span class="kc-tool">Impacket</span></div>
+              <div class="kc-detail">Réutilisation du hash NTLM pour s'authentifier sur d'autres machines sans connaître le mot de passe en clair</div>
+            </div>
+            <div class="kc-arrow">▼</div>
+          </div>
+          <div class="kc-step">
+            <div class="kc-num">05</div>
+            <div class="kc-content">
+              <div class="kc-phase">Compromission totale</div>
+              <div class="kc-action">DCSync — extraction de tous les hashes du domaine depuis un DC <span class="kc-tool">Mimikatz</span> <span class="kc-tool">secretsdump</span></div>
+              <div class="kc-detail">Avec les droits de réplication, l'attaquant extrait le hash krbtgt → Golden Ticket → persistance indéfinie</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Techniques d'attaque -->
+    <div class="v-section reveal">
+      <div class="section-label">Techniques d'attaque</div>
+      <h2 class="section-title">Les 6 Attaques AD à Connaître</h2>
+      <div class="threat-grid">
+        <div class="threat-card">
+          <div class="threat-icon red">🔑</div>
+          <div class="threat-name">Pass-the-Hash (PtH)</div>
+          <div class="threat-desc">L'attaquant récupère le hash NTLM d'un compte (via Mimikatz ou les dumps mémoire de lsass.exe) et l'utilise directement pour s'authentifier sur d'autres machines — sans jamais connaître le mot de passe en clair.</div>
+          <span class="threat-level critique">⬤ CRITIQUE</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon orange">🎫</div>
+          <div class="threat-name">Kerberoasting</div>
+          <div class="threat-desc">Tout utilisateur du domaine peut demander un ticket Kerberos (TGS) pour n'importe quel compte de service (SPN). Ce ticket est chiffré avec le hash du compte de service et peut être cracké offline. Les comptes de service ont souvent des mots de passe faibles.</div>
+          <span class="threat-level critique">⬤ CRITIQUE</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon purple">🔄</div>
+          <div class="threat-name">DCSync</div>
+          <div class="threat-desc">En simulant le comportement d'un contrôleur de domaine, l'attaquant avec les droits de réplication (DS-Replication-Get-Changes) peut extraire les hashes de tous les comptes du domaine, y compris krbtgt, via l'API de réplication AD.</div>
+          <span class="threat-level critique">⬤ CRITIQUE</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon blue">🌐</div>
+          <div class="threat-name">LLMNR / NBT-NS Poisoning</div>
+          <div class="threat-desc">Quand une machine cherche un nom d'hôte inexistant, elle diffuse une requête LLMNR/NBT-NS sur le réseau local. L'attaquant répond en se faisant passer pour la cible, récupère les hashes NTLMv2 et les cracke ou les relaye (NTLM Relay).</div>
+          <span class="threat-level eleve">⬤ ÉLEVÉ</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon yellow">🏆</div>
+          <div class="threat-name">Golden Ticket</div>
+          <div class="threat-desc">Avec le hash krbtgt (compte critique du domaine), l'attaquant peut forger n'importe quel ticket Kerberos (TGT) pour n'importe quel utilisateur, y compris des comptes inexistants. Donne un accès persistant indéfini, même si les mots de passe sont changés.</div>
+          <span class="threat-level critique">⬤ CRITIQUE</span>
+        </div>
+        <div class="threat-card">
+          <div class="threat-icon green">👻</div>
+          <div class="threat-name">AS-REP Roasting</div>
+          <div class="threat-desc">Si un compte a l'option "Ne pas exiger la pré-authentification Kerberos", un attaquant peut demander un AS-REP chiffré sans authentification préalable. Ce ticket est cracké offline pour obtenir le mot de passe du compte visé.</div>
+          <span class="threat-level eleve">⬤ ÉLEVÉ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modèle de Tier -->
+    <div class="v-section reveal">
+      <div class="section-label">Hardening — Architecture</div>
+      <h2 class="section-title">Le Modèle de Tier : Cloisonner pour Protéger</h2>
+      <div class="tier-rule">
+        ⚠️ <strong>Règle d'or :</strong> Un compte administrateur de Tier 0 ne doit JAMAIS se connecter sur une machine de Tier 1 ou Tier 2. Un compte compromis à un niveau inférieur ne doit pas permettre d'escalader vers un niveau supérieur.
+      </div>
+      <div class="tier-grid">
+        <div class="tier-card t0">
+          <div class="tier-badge">T0</div>
+          <div class="tier-name">Contrôle du domaine</div>
+          <div class="tier-desc">Contrôleurs de domaine, PKI, ADFS, outils d'administration AD. Comptes Domain Admin, Schema Admin. Accès via PAW dédiés uniquement. Surveillance maximale.</div>
+        </div>
+        <div class="tier-card t1">
+          <div class="tier-badge">T1</div>
+          <div class="tier-name">Serveurs d'entreprise</div>
+          <div class="tier-desc">Serveurs applicatifs, fichiers, bases de données, hyperviseurs. Comptes Admin Serveur dédiés. Jamais utilisés pour naviguer sur le web ou lire des mails.</div>
+        </div>
+        <div class="tier-card t2">
+          <div class="tier-badge">T2</div>
+          <div class="tier-name">Postes utilisateurs</div>
+          <div class="tier-desc">Postes de travail, laptops, téléphones. Comptes utilisateurs standards. Helpdesk avec des droits limités aux postes uniquement. Première ligne d'exposition.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hardening pratiques -->
+    <div class="v-section reveal">
+      <div class="section-label">Hardening — Mesures clés</div>
+      <h2 class="section-title">Durcir son Active Directory</h2>
+      <div class="practices-grid">
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">01</div><div class="practice-title">LAPS — Mots de passe locaux uniques</div></div>
+          <ul class="practice-list">
+            <li>Déployer Microsoft LAPS pour générer un mot de passe administrateur local unique par machine</li>
+            <li>Élimine la propagation latérale via le compte Administrateur local partagé</li>
+            <li>Les mots de passe sont stockés dans AD et renouvelés automatiquement</li>
+            <li>Préférer Windows LAPS (intégré depuis Windows Server 2022/Win 11 22H2)</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">02</div><div class="practice-title">Protected Users — Groupe de sécurité</div></div>
+          <ul class="practice-list">
+            <li>Ajouter les comptes sensibles au groupe "Protected Users" (Admins, comptes de service critiques)</li>
+            <li>Désactive le cache des credentials Kerberos en mémoire</li>
+            <li>Force l'utilisation de Kerberos uniquement (pas de NTLM)</li>
+            <li>Réduit drastiquement l'exposition aux attaques Pass-the-Hash et Mimikatz</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">03</div><div class="practice-title">Désactiver LLMNR &amp; NBT-NS</div></div>
+          <ul class="practice-list">
+            <li>Désactiver LLMNR via GPO : "Turn Off Multicast Name Resolution"</li>
+            <li>Désactiver NetBIOS over TCP/IP sur toutes les interfaces réseau</li>
+            <li>Déployer un serveur DNS interne fiable pour éviter les résolutions de secours</li>
+            <li>Bloquer le port 5355 (LLMNR) et 137-138 (NetBIOS) au niveau firewall</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">04</div><div class="practice-title">Gérer les comptes de service (SPN)</div></div>
+          <ul class="practice-list">
+            <li>Attribuer des mots de passe forts (+25 caractères aléatoires) aux comptes de service</li>
+            <li>Préférer les gMSA (group Managed Service Accounts) — mots de passe gérés par AD</li>
+            <li>Auditer régulièrement tous les SPNs enregistrés dans AD</li>
+            <li>Limiter les droits des comptes de service au strict nécessaire</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">05</div><div class="practice-title">Credential Guard &amp; Isolation</div></div>
+          <ul class="practice-list">
+            <li>Activer Windows Defender Credential Guard sur les machines sensibles</li>
+            <li>Isole le processus lsass.exe dans un environnement virtualisé (VSM)</li>
+            <li>Empêche Mimikatz d'extraire les hashes NTLM de la mémoire vive</li>
+            <li>Disponible depuis Windows 10 Enterprise / Windows Server 2016</li>
+          </ul>
+        </div>
+        <div class="practice-card">
+          <div class="practice-header"><div class="practice-num">06</div><div class="practice-title">Restreindre les droits de réplication</div></div>
+          <ul class="practice-list">
+            <li>Auditer qui possède les droits "Replicating Directory Changes" dans AD</li>
+            <li>Seuls les contrôleurs de domaine doivent avoir ces droits</li>
+            <li>Supprimer ces droits de tout compte utilisateur ou de service</li>
+            <li>Surveiller l'Event ID 4662 pour détecter toute tentative de DCSync</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event IDs -->
+    <div class="v-section reveal">
+      <div class="section-label">Détection — Windows Event Log</div>
+      <h2 class="section-title">Event IDs Clés à Surveiller</h2>
+      <div class="event-table-wrap">
+        <table class="event-table">
+          <thead>
+            <tr>
+              <th>Event ID</th>
+              <th>Description</th>
+              <th>Attaque détectée</th>
+              <th>Criticité</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="ev-id">4625</td><td>Échec d'authentification</td><td>Brute-force, password spraying</td><td><span class="ev-high">ÉLEVÉ</span></td></tr>
+            <tr><td class="ev-id">4648</td><td>Logon avec credentials explicites</td><td>Pass-the-Hash, mouvement latéral</td><td><span class="ev-critical">CRITIQUE</span></td></tr>
+            <tr><td class="ev-id">4662</td><td>Opération sur un objet AD</td><td>DCSync (réplication non autorisée)</td><td><span class="ev-critical">CRITIQUE</span></td></tr>
+            <tr><td class="ev-id">4672</td><td>Privilèges spéciaux assignés</td><td>Élévation de privilèges, Golden Ticket</td><td><span class="ev-critical">CRITIQUE</span></td></tr>
+            <tr><td class="ev-id">4720</td><td>Création d'un compte utilisateur</td><td>Backdoor, persistance</td><td><span class="ev-high">ÉLEVÉ</span></td></tr>
+            <tr><td class="ev-id">4728/4732</td><td>Ajout d'un membre à un groupe</td><td>Escalade de privilèges (ajout à Domain Admins)</td><td><span class="ev-critical">CRITIQUE</span></td></tr>
+            <tr><td class="ev-id">4769</td><td>Ticket Kerberos (TGS) demandé</td><td>Kerberoasting (volume de tickets RC4)</td><td><span class="ev-high">ÉLEVÉ</span></td></tr>
+            <tr><td class="ev-id">4771</td><td>Échec de pré-authentification Kerberos</td><td>AS-REP Roasting, brute-force Kerberos</td><td><span class="ev-high">ÉLEVÉ</span></td></tr>
+            <tr><td class="ev-id">7045</td><td>Nouveau service installé</td><td>Persistance via service malveillant</td><td><span class="ev-high">ÉLEVÉ</span></td></tr>
+            <tr><td class="ev-id">1102</td><td>Journal d'audit effacé</td><td>Anti-forensique, couverture des traces</td><td><span class="ev-critical">CRITIQUE</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Outils AD -->
+    <div class="v-section reveal">
+      <div class="section-label">Boîte à outils AD</div>
+      <h2 class="section-title">Outils d'Audit &amp; de Défense AD</h2>
+      <div class="ad-tools-grid">
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">BloodHound</div><span class="ad-tool-type red">OFFENSIF</span></div>
+          <div class="ad-tool-desc">Cartographie les chemins d'attaque dans AD en visualisant les relations entre objets. Indispensable pour comprendre son exposition réelle.</div>
+        </div>
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">PingCastle</div><span class="ad-tool-type green">AUDIT</span></div>
+          <div class="ad-tool-desc">Génère un score de sécurité AD avec un rapport détaillé des risques. Outil de référence pour les audits, gratuit pour usage interne.</div>
+        </div>
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">Purple Knight</div><span class="ad-tool-type green">AUDIT</span></div>
+          <div class="ad-tool-desc">Outil gratuit de Semperis qui évalue la posture de sécurité AD en contrôlant +100 indicateurs de compromission.</div>
+        </div>
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">Mimikatz</div><span class="ad-tool-type red">OFFENSIF</span></div>
+          <div class="ad-tool-desc">Extraction de credentials depuis la mémoire lsass. Outil de référence des pentesters pour démontrer les risques liés aux hashes NTLM.</div>
+        </div>
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">MS Defender for Identity</div><span class="ad-tool-type blue">DÉFENSIF</span></div>
+          <div class="ad-tool-desc">Solution Microsoft (anciennement ATP) qui analyse le trafic Kerberos/LDAP pour détecter Pass-the-Hash, DCSync, Kerberoasting en temps réel.</div>
+        </div>
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">Rubeus</div><span class="ad-tool-type red">OFFENSIF</span></div>
+          <div class="ad-tool-desc">Outil C# dédié aux attaques Kerberos : Kerberoasting, AS-REP Roasting, Pass-the-Ticket, Golden/Silver Ticket. Utilisé en Red Team.</div>
+        </div>
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">Responder</div><span class="ad-tool-type red">OFFENSIF</span></div>
+          <div class="ad-tool-desc">Empoisonne les réponses LLMNR/NBT-NS pour capturer les hashes NTLMv2 sur le réseau local. Démontre l'importance de désactiver ces protocoles.</div>
+        </div>
+        <div class="ad-tool-card">
+          <div class="ad-tool-header"><div class="ad-tool-name">Wazuh + Sysmon</div><span class="ad-tool-type yellow">DÉTECTION</span></div>
+          <div class="ad-tool-desc">Sysmon enrichit les Event Logs Windows. Wazuh les centralise et les corrèle pour détecter les attaques AD avec des règles personnalisées.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sources -->
+    <div class="v-section reveal">
+      <div class="section-label">Sources &amp; Références</div>
+      <h2 class="section-title">Pour Aller Plus Loin</h2>
+      <div class="conclusion-block">
+        <h3>Active Directory : un chantier permanent</h3>
+        <p>La sécurité Active Directory n'est pas un projet ponctuel : c'est une <span class="highlight">démarche continue</span>. Un audit PingCastle mensuel, la surveillance des Event IDs critiques dans un SIEM, et l'application progressive du modèle de Tier permettent de réduire drastiquement la surface d'attaque. En tant que technicien SISR, maîtriser ces concepts vous place à un niveau d'expertise reconnu par les recruteurs et les équipes SOC.</p>
+        <div class="sources-row">
+          <span class="source-chip">ANSSI — Guide AD</span>
+          <span class="source-chip">MITRE ATT&amp;CK — TA0006</span>
+          <span class="source-chip">Microsoft Docs — AD Security</span>
+          <span class="source-chip">BloodHound Docs</span>
+          <span class="source-chip">PingCastle.com</span>
+          <span class="source-chip">SpecterOps — Blog</span>
+          <span class="source-chip">HackTricks — AD</span>
+          <span class="source-chip">TryHackMe — AD paths</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="footer-credit">© 2025 Victor Trioux – Sources : ANSSI, CERT-FR, ENISA, IBM Security Report 2024 · Microsoft Docs · SpecterOps · MITRE ATT&CK</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ PAGE: ENTREPRISE -->
+  <div class="page" id="page-entreprise">
+    <div class="page-header">
+      <div class="section-label">05 — Entreprise</div>
+      <h2 class="section-title">Tersedia</h2>
+    </div>
+    <div class="certs-row reveal">
       <span class="cert-badge">ISO 27001</span>
       <span class="cert-badge">HDS</span>
       <span class="cert-badge">ExpertCyber · ANSSI</span>
       <span class="cert-badge">Hexatrust</span>
     </div>
-    <div class="services-grid">
+    <div class="services-grid reveal">
       <div class="service-card">
         <h4><a href="https://tersedia.fr/it-as-a-service/" target="_blank">IT-as-a-Service</a></h4>
         <p>Infrastructure managée (serveurs, firewalls, messagerie, wifi) totalement prise en charge. Permet aux clients de se concentrer sur leur cœur de métier.</p>
@@ -516,13 +1409,13 @@
         <p>Audit, design d'architecture, migration, intégration et transfert de compétences. Expertise sur la virtualisation, stockage, systèmes et sécurité.</p>
       </div>
     </div>
-    <div class="entreprise-text">
+    <div class="entreprise-text reveal">
       <p>Je réalise mon alternance au sein de l'entreprise <a href="https://tersedia.fr/" target="_blank">Tersedia</a>, une SAS de 50 à 100 personnes spécialisée dans le conseil en systèmes et logiciels informatiques, fondée le 1er septembre 1996. Tersedia se positionne comme un partenaire de confiance pour les entreprises ayant des problématiques informatiques complexes, avec un chiffre d'affaires d'approximativement 12,94 M d'euros en 2023.</p>
       <p>Dans le cadre de sa croissance, Tersedia a fusionné avec Res.sources en 2016, puis a acquis Kerberos en 2024-2025, une société spécialisée en réseaux et cybersécurité avec une expertise avancée sur les technologies Fortinet. Ces opérations s'inscrivent dans l'ambition de l'entreprise de doubler son chiffre d'affaires tous les trois ans. Tersedia bénéficie de partenariats technologiques majeurs : HPE, Dell, Microsoft, VMware, Sekoia.io et HarfangLab.</p>
       <p>Au sein de Tersedia, j'occupe le poste de technicien systèmes et réseaux au centre de services. Mon rôle consiste à diagnostiquer et résoudre les incidents liés aux postes de travail, aux applications métiers, aux problèmes réseau et aux environnements virtualisés. J'assure également le suivi des tickets via PRTG, la maintenance préventive, la préparation du matériel et la gestion des comptes utilisateurs.</p>
     </div>
     <p class="tickets-label">// exemples de tickets traités</p>
-    <div class="ticket-gallery">
+    <div class="ticket-gallery reveal">
       <a href="https://tersedia.freshservice.com/a/tickets/79382?current_tab=details" target="_blank">
         <img src="https://i.ytimg.com/vi/vCp0gpsV95E/maxresdefault.jpg" alt="">
       </a>
@@ -539,45 +1432,55 @@
         <img src="https://community.fortinet.com/legacyfs/online/images/kb_17955_2.png" alt="">
       </a>
     </div>
-  </section>
+    <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
+  </div>
 
-  <!-- FOOTER -->
-  <footer class="footer-large">
-    <section id="contact">
-      <h2><i class="fas fa-envelope"></i> Me Contacter</h2>
+  <!-- ═══════════════════════════════════════════════ PAGE: CONTACT -->
+  <div class="page" id="page-contact">
+    <div class="page-header">
+      <div class="section-label">06 — Contact</div>
+      <h2 class="section-title">Me Contacter</h2>
+    </div>
+    <div class="contact-grid reveal">
       <form id="contactForm" class="contact-form">
         <label>Nom :</label>
         <input type="text" name="name" required>
         <label>Email :</label>
         <input type="email" name="email" required>
         <label>Message :</label>
-        <textarea name="message" rows="5" required></textarea>
-        <button type="submit">Envoyer</button>
+        <textarea name="message" rows="6" required></textarea>
+        <button type="submit">Envoyer <i class="fas fa-paper-plane"></i></button>
       </form>
-    </section>
-    <div class="footer-container">
-      <div class="footer-col">
-        <h3>À propos</h3>
-        <p>Étudiant en BTS SIO SISR chez Ensitech, alternant chez Tersedia.</p>
-      </div>
-      <div class="footer-col">
-        <h3>Contact</h3>
-        <p>Email Pro: victor.trioux@ensitech.eu</p>
-        <p>Email : victor.trioux@gmail.com</p>
-      </div>
-      <div class="footer-col">
-        <h3>Réseaux</h3>
-        <a href="https://www.linkedin.com/in/ton-profil" target="_blank"><p><i class="fab fa-linkedin"></i> LinkedIn</p></a>
-        <a href="https://github.com/ton-pseudo" target="_blank"><p><i class="fab fa-github"></i> GitHub</p></a>
+      <div class="contact-info">
+        <div class="contact-info-card">
+          <h4>// coordonnées</h4>
+          <a href="mailto:victor.trioux@ensitech.eu"><i class="fas fa-envelope"></i>victor.trioux@ensitech.eu</a>
+          <a href="mailto:victor.trioux@gmail.com"><i class="fas fa-envelope"></i>victor.trioux@gmail.com</a>
+        </div>
+        <div class="contact-info-card">
+          <h4>// réseaux</h4>
+          <div class="contact-socials">
+            <a href="https://www.linkedin.com/in/ton-profil" target="_blank" class="contact-social-btn">
+              <i class="fab fa-linkedin"></i> LinkedIn
+            </a>
+            <a href="https://github.com/ton-pseudo" target="_blank" class="contact-social-btn">
+              <i class="fab fa-github"></i> GitHub
+            </a>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <h4>// localisation</h4>
+          <p><i class="fas fa-map-marker-alt" style="color:var(--green);margin-right:8px"></i>Chatou, Île-de-France</p>
+        </div>
       </div>
     </div>
     <p class="footer-credit">© 2025 Victor Trioux – Tous droits réservés</p>
-  </footer>
+  </div>
 
-</div>
+</main>
 
 <script>
-  /* MATRIX RAIN */
+  /* ── MATRIX RAIN ── */
   const canvas = document.getElementById('matrix-canvas');
   const ctx = canvas.getContext('2d');
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()[]{}<>/\\|アイウエオカキクケコサシスセソ';
@@ -602,24 +1505,62 @@
   window.addEventListener('resize', initMatrix);
   setInterval(drawMatrix, 50);
 
-  /* SCROLL REVEAL */
-  const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
-  }, { threshold: 0.05 });
-  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+  /* ── PAGE NAVIGATION ── */
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav-item').forEach(a => a.classList.remove('active'));
 
-  /* NAV SCROLLSPY */
-  const navLinks = document.querySelectorAll('.nav-links a');
-  const spyObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        navLinks.forEach(l => l.classList.remove('active'));
-        const a = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
-        if (a) a.classList.add('active');
-      }
+    const page = document.getElementById(pageId);
+    page.classList.add('active');
+
+    const navItem = document.querySelector(`.sidebar-nav-item[data-page="${pageId}"]`);
+    if (navItem) navItem.classList.add('active');
+
+    page.querySelectorAll('.reveal').forEach((el, i) => {
+      el.classList.remove('visible');
+      setTimeout(() => el.classList.add('visible'), i * 90);
     });
-  }, { threshold: 0.3, rootMargin: '-52px 0px 0px 0px' });
-  document.querySelectorAll('section[id], div[id]').forEach(s => spyObs.observe(s));
+
+    document.getElementById('mainContent').scrollTop = 0;
+    closeSidebar();
+  }
+
+  document.querySelectorAll('.sidebar-nav-item').forEach(item => {
+    item.addEventListener('click', () => showPage(item.dataset.page));
+  });
+
+  /* Reveal initial page */
+  document.querySelectorAll('#page-accueil .reveal').forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), 150 + i * 100);
+  });
+
+  /* ── SIDEBAR COLLAPSE ── */
+  const sidebar = document.getElementById('sidebar');
+  const mainContent = document.getElementById('mainContent');
+  const collapserIcon = document.getElementById('collapserIcon');
+
+  document.getElementById('sidebarCollapser').addEventListener('click', () => {
+    const isCollapsed = sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('collapsed', isCollapsed);
+    collapserIcon.className = isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+  });
+
+  /* ── MOBILE SIDEBAR ── */
+  const overlay = document.getElementById('sidebarOverlay');
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+
+  const toggleBtn = document.getElementById('sidebarToggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+  }
+  overlay.addEventListener('click', closeSidebar);
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
