@@ -1,0 +1,479 @@
+/* ───────────────────────────────────────────── */
+/*  GLOBAL                                       */
+/* ───────────────────────────────────────────── */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    color: #f0f0f0;
+    background: url('image/index.jpg') center/cover fixed no-repeat;
+}
+
+.overlay {
+    background: rgba(0, 0, 0, 0.5);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+/* ───────────────────────────────────────────── */
+/*  HEADER / NAVIGATION                          */
+/* ───────────────────────────────────────────── */
+
+header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: rgba(21, 33, 45, 0.9);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+header h1 {
+    margin: 0.5rem 0;
+    font-size: 2.5rem;
+}
+
+header p {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin: 0 1rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: navSlideIn 0.5s forwards;
+}
+
+nav ul li:nth-child(1) { animation-delay: 0.2s; }
+nav ul li:nth-child(2) { animation-delay: 0.4s; }
+nav ul li:nth-child(3) { animation-delay: 0.6s; }
+nav ul li:nth-child(4) { animation-delay: 0.8s; }
+nav ul li:nth-child(5) { animation-delay: 1s; }
+nav ul li:nth-child(6) { animation-delay: 1.2s; }
+nav ul li:nth-child(7) { animation-delay: 1.4s; }
+
+@keyframes navSlideIn {
+    to { transform: translateY(0); opacity: 1; }
+}
+
+nav ul li a {
+    color: #00bfff;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 6px 12px;
+    position: relative;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    color: #fff;
+}
+
+nav ul li a::after {
+    content: "";
+    width: 0;
+    height: 2px;
+    background: #00bfff;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transition: width 0.3s;
+}
+
+nav ul li a:hover::after {
+    width: 100%;
+}
+
+/* ───────────────────────────────────────────── */
+/*  SECTIONS                                     */
+/* ───────────────────────────────────────────── */
+
+section {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 12px rgba(0,0,0,0.5);
+}
+
+section h2 {
+    color: #00bfff;
+    margin-bottom: 1rem;
+}
+
+/* ───────────────────────────────────────────── */
+/*  ACCORDÉON                                    */
+/* ───────────────────────────────────────────── */
+
+.accordion-header {
+    width: 100%;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #00bfff;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.accordion-header i {
+    transition: transform 0.3s;
+}
+
+.accordion-header.active i {
+    transform: rotate(90deg);
+}
+
+.accordion-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.accordion-content.open {
+    display: block;
+}
+
+/* ───────────────────────────────────────────── */
+/*  PROJETS                                      */
+/* ───────────────────────────────────────────── */
+
+.project-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.project-gallery img {
+    width: 280px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: 0.5s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.project-gallery img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+
+/* ───────────────────────────────────────────── */
+/*  TABS                                         */
+/* ───────────────────────────────────────────── */
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    border: none;
+    background: #00bfff;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-button.active {
+    background: #0077aa;
+}
+
+.tab-button:hover {
+    transform: translateY(-3px);
+}
+
+.tab-content {
+    display: none;
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ───────────────────────────────────────────── */
+/*  VEILLE CARDS                                 */
+/* ───────────────────────────────────────────── */
+
+.veille-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.veille-card {
+    width: 280px;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: 0.3s;
+}
+
+.veille-card:hover {
+    transform: translateY(-5px);
+}
+
+.veille-card h3 {
+    margin: 0;
+    color: #00bfff;
+}
+
+.veille-card a {
+    margin-top: .5rem;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* ───────────────────────────────────────────── */
+/*  CONTACT FORM                                 */
+/* ───────────────────────────────────────────── */
+
+#contact {
+    max-width: 700px;
+    margin: 2rem auto;
+    background: rgba(255,255,255,0.05);
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-form label {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #00bfff;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 0.75rem;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+    background: #f0f0f0;
+    color: #000;
+}
+
+.contact-form button {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #00bfff;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.contact-form button:hover {
+    background: #0077aa;
+}
+
+/* ───────────────────────────────────────────── */
+/*  FOOTER                                       */
+/* ───────────────────────────────────────────── */
+
+.footer-large {
+    background: rgba(21,33,45,0.95);
+    padding: 3rem 1rem;
+    color: #fff;
+}
+
+.footer-container {
+    max-width: 1000px;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.footer-col h3 {
+    color: #00bfff;
+    margin-bottom: .5rem;
+}
+
+.footer-credit {
+    margin-top: 2rem;
+    color: #bbb;
+    text-align: center;
+}
+
+/* ───────────────────────────────────────────── */
+/*  ANIMATIONS                                   */
+/* ───────────────────────────────────────────── */
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.glow-animated {
+  color: #fff;
+  text-shadow:
+    0 0 5px #fff,
+    0 0 10px #0f63e3,
+    0 0 20px #0f63e3,
+    0 0 40px #0f63e3;
+  animation: glowPulse 2s infinite alternate;
+}
+
+@keyframes glowPulse {
+  from {
+    text-shadow:
+      0 0 5px #ffffff,
+      0 0 10px #0f63e3,
+      0 0 20px #0f63e3;
+  }
+  to {
+    text-shadow:
+      0 0 10px #fff,
+      0 0 20px #0f63e3,
+      0 0 40px #0f63e3,
+      0 0 80px #0f63e3;
+  }
+}
+
+/* Curseur principal */
+#custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background-color: #00bfff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform, width, height, background-color;
+  mix-blend-mode: difference; /* effet lumineux selon le fond */
+}
+
+/* Curseur principal */
+#custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background-color: #00bfff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform, width, height, background-color;
+  mix-blend-mode: difference;
+  box-shadow: 0 0 8px #00bfff, 0 0 16px #00bfff;
+  transform: translate(-50%, -50%);
+}
+
+/* Traînées multiples */
+.cursor-trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.3;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px #00bfff, 0 0 12px #00bfff;
+  transition: width 0.2s, height 0.2s, opacity 0.2s;
+}
+
+/* Cache le curseur natif */
+body {
+  cursor: none;
+}
+
+/* Agrandissement sur liens et boutons */
+a:hover, .button:hover, button:hover {
+  cursor: none;
+}
+
+/* VEILLE CARDS ADAPTÉES À TON STYLE */
+
+.veille-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.veille-card {
+    width: 280px;
+    padding: 1.2rem;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+}
+
+.veille-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+.veille-card .icon {
+    font-size: 2rem;
+    color: #00bfff;
+    margin-bottom: 10px;
+}
+
+.veille-card h3 {
+    color: #00bfff;
+    margin: 0.5rem 0;
+}
+
+.veille-card p {
+    font-size: 0.9rem;
+    color: #f0f0f0;
+    margin-bottom: 0.5rem;
+}
+
+.veille-card a {
+    color: #00bfff;
+    font-weight: bold;
+    text-decoration: underline;
+    transition: color 0.3s;
+}
+
+.veille-card a:hover {
+    color: #fff;
+}
+
+.veille-card .icon img {
+    width: 120px;      /* largeur de l'image */
+    height: 120px;     /* hauteur de l'image */
+    object-fit: contain; /* pour que l'image ne se déforme pas */
+    margin-bottom: 5px;
+}
